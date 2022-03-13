@@ -69,3 +69,24 @@ func TestPow(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestTrueDiv(t *testing.T) {
+	a, _ := NewFieldElement(3, 31)
+	b, _ := NewFieldElement(24, 31)
+	c, _ := NewFieldElement(4, 31)
+	println(a.truediv(b).repr())
+	if a.truediv(b).ne(c) {
+		t.Fail()
+	}
+	a, _ = NewFieldElement(17, 31)
+	c, _ = NewFieldElement(29, 31)
+	if a.pow(-3).ne(c) {
+		t.Fail()
+	}
+	a, _ = NewFieldElement(4, 31)
+	b, _ = NewFieldElement(11, 31)
+	c, _ = NewFieldElement(13, 31)
+	if a.pow(-4).mul(b).ne(c) {
+		t.Fail()
+	}
+}

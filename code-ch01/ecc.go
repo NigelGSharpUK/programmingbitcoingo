@@ -2,7 +2,6 @@ package ecc
 
 import (
 	"errors"
-	"math"
 	"strconv"
 )
 
@@ -97,8 +96,42 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 	return res
 }
 
+// Need a pow function with modulus, like in Python
+func pow(base int, exp int, modulus int) int {
+	if exp == 0 {
+		return 1
+	} else if exp == 1 {
+		return mod(base, modulus)
+	} else {
+		res := 1
+		for i := 0; i < exp; i++ {
+			res = mod(res*base, modulus)
+		}
+		return res
+	}
+}
+
 func (fe *FieldElement) pow(exp int) *FieldElement {
-	num := mod(int(math.Pow(float64(fe.num), float64(exp))), fe.prime)
+	n := mod(exp, (fe.prime - 1))
+	num := pow(fe.num, n, fe.prime)
+	res, err := NewFieldElement(num, fe.prime)
+	if err != nil {
+		panic(err.Error)
+	}
+	return res
+}
+
+func (fe *FieldElement) truediv(other *FieldElement) *FieldElement {
+	//panic("Not Implemented")
+
+	// Answer Exercise 9
+	if fe == nil || other == nil {
+		panic("Cannot divide nil pointers")
+	}
+	if fe.prime != other.prime {
+		panic("Cannot divide two numbers in different Fields")
+	}
+	num := mod(fe.num*pow(other.num, fe.prime-2, fe.prime), fe.prime)
 	res, err := NewFieldElement(num, fe.prime)
 	if err != nil {
 		panic(err.Error)
