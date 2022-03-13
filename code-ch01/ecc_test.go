@@ -46,3 +46,26 @@ func TestSub(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestMul(t *testing.T) {
+	a, _ := NewFieldElement(24, 31)
+	b, _ := NewFieldElement(19, 31)
+	c, _ := NewFieldElement(22, 31)
+	if a.mul(b).ne(c) {
+		t.Fail()
+	}
+}
+
+func TestPow(t *testing.T) {
+	a, _ := NewFieldElement(17, 31)
+	c, _ := NewFieldElement(15, 31)
+	if a.pow(3).ne(c) {
+		t.Fail()
+	}
+	a, _ = NewFieldElement(5, 31)
+	b, _ := NewFieldElement(18, 31)
+	c, _ = NewFieldElement(16, 31)
+	if a.pow(5).mul(b).ne(c) {
+		t.Fail()
+	}
+}
