@@ -37,3 +37,38 @@ func (fe *FieldElement) ne(other *FieldElement) bool {
 	//panic("Not Implemented")
 	return !fe.eq(other) // Answer Exercise 1
 }
+
+func (fe *FieldElement) add(other *FieldElement) *FieldElement {
+	if fe == nil || other == nil {
+		panic("Cannot add nil pointers")
+	}
+	if fe.prime != other.prime {
+		panic("Cannot add two numbers in different Fields")
+	}
+	num := (fe.num + other.num) % fe.prime
+	res, err := NewFieldElement(num, fe.prime)
+	if err != nil {
+		panic(err.Error())
+	}
+	return res
+}
+
+// Go's % operator is DIFFERENT to Python's % operator
+func mod(a, b int) int {
+	return (a%b + b) % b
+}
+
+func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
+	if fe == nil || other == nil {
+		panic("Cannot subtract nil pointers")
+	}
+	if fe.prime != other.prime {
+		panic("Cannot subtract two numbers in different Fields")
+	}
+	num := mod((fe.num - other.num), fe.prime)
+	res, err := NewFieldElement(num, fe.prime)
+	if err != nil {
+		panic(err.Error())
+	}
+	return res
+}
