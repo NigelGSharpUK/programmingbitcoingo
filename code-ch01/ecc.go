@@ -84,10 +84,10 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 
 	// Answer Exercise 6
 	if fe == nil || other == nil {
-		panic("Cannot subtract nil pointers")
+		panic("Cannot multiply nil pointers")
 	}
 	if fe.prime != other.prime {
-		panic("Cannot subtract two numbers in different Fields")
+		panic("Cannot multiply two numbers in different Fields")
 	}
 	num := mod((fe.num * other.num), fe.prime)
 	res, err := NewFieldElement(num, fe.prime)
