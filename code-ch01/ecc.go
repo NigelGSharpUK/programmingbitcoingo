@@ -87,7 +87,7 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 }
 
 // Need a pow function with modulus, like in Python
-func pow(base int, exp int, modulus int) int {
+func powMod(base int, exp int, modulus int) int {
 	if exp < 0 {
 		panic("Negative exponent not supported here")
 	}
@@ -106,7 +106,7 @@ func pow(base int, exp int, modulus int) int {
 
 func (fe *FieldElement) pow(exp int) *FieldElement {
 	n := mod(exp, (fe.prime - 1))
-	num := pow(fe.num, n, fe.prime)
+	num := powMod(fe.num, n, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
@@ -121,6 +121,6 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	num := mod(fe.num*pow(other.num, fe.prime-2, fe.prime), fe.prime)
+	num := mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }

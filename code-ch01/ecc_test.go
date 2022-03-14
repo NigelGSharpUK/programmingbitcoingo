@@ -30,6 +30,42 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestMod(t *testing.T) {
+	if mod(0, 1) != 0 {
+		t.Fail()
+	}
+	if mod(0, 2) != 0 {
+		t.Fail()
+	}
+	if mod(1, 2) != 1 {
+		t.Fail()
+	}
+	if mod(2, 2) != 0 {
+		t.Fail()
+	}
+	if mod(-1, 2) != 1 {
+		t.Fail()
+	}
+}
+
+func TestPowMod(t *testing.T) {
+	if powMod(0, 0, 123) != 1 {
+		t.Fail() // Slightly contraversial
+	}
+	if powMod(0, 1, 123) != 0 {
+		t.Fail()
+	}
+	if powMod(1, 0, 123) != 1 {
+		t.Fail()
+	}
+	if powMod(2, 2, 123) != 4 {
+		t.Fail()
+	}
+	if powMod(4, 4, 5) != 1 {
+		t.Fail()
+	}
+}
+
 func TestSub(t *testing.T) {
 	a := NewFieldElement(29, 31)
 	b := NewFieldElement(4, 31)
