@@ -2,7 +2,7 @@ package ecc
 
 import "testing"
 
-func TestNeq(t *testing.T) {
+func TestNe(t *testing.T) {
 	a := NewFieldElement(2, 31)
 	b := NewFieldElement(2, 31)
 	c := NewFieldElement(15, 31)
@@ -112,6 +112,47 @@ func TestDiv(t *testing.T) {
 	a = NewFieldElement(4, 31)
 	b = NewFieldElement(11, 31)
 	if a.pow(-4).mul(b).ne(NewFieldElement(13, 31)) {
+		t.Fail()
+	}
+}
+
+func TestPointNe(t *testing.T) {
+	a := NewPoint(3, 7, 5, 7)
+	b := NewPoint(18, 77, 5, 7)
+	if a.ne(b) == false {
+		t.Fail()
+	}
+	if a.ne(a) {
+		t.Fail()
+	}
+}
+
+func TestPointAdd0(t *testing.T) {
+	a := NewInfPoint(5, 7)
+	b := NewPoint(2, 5, 5, 7)
+	c := NewPoint(2, -5, 5, 7)
+	if a.add(b).ne(b) {
+		t.Fail()
+	}
+	if b.add(a).ne(b) {
+		t.Fail()
+	}
+	if b.add(c).ne(a) {
+		t.Fail()
+	}
+}
+
+func TestPointAdd1(t *testing.T) {
+	a := NewPoint(3, 7, 5, 7)
+	b := NewPoint(-1, -1, 5, 7)
+	if a.add(b).ne(NewPoint(2, -5, 5, 7)) {
+		t.Fail()
+	}
+}
+
+func TestPointAdd2(t *testing.T) {
+	a := NewPoint(-1, -1, 5, 7)
+	if a.add(a).ne(NewPoint(18, 77, 5, 7)) {
 		t.Fail()
 	}
 }
