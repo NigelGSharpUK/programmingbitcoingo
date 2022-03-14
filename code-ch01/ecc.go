@@ -1,7 +1,6 @@
 package ecc
 
 import (
-	"errors"
 	"strconv"
 )
 
@@ -10,14 +9,14 @@ type FieldElement struct {
 	prime int
 }
 
-func NewFieldElement(num int, prime int) (*FieldElement, error) {
+func NewFieldElement(num int, prime int) *FieldElement {
 	if num >= prime || num < 0 {
-		return nil, errors.New("Num " + strconv.Itoa(num) + " not in field range 0 to " + strconv.Itoa(prime-1))
+		panic("num must be between 0 and prime-1 inclusive")
 	}
 	fe := new(FieldElement)
 	fe.num = num
 	fe.prime = prime
-	return fe, nil
+	return fe
 }
 
 func (fe *FieldElement) repr() string {
@@ -51,11 +50,7 @@ func (fe *FieldElement) add(other *FieldElement) *FieldElement {
 		panic("Cannot add two numbers in different Fields")
 	}
 	num := (fe.num + other.num) % fe.prime // [  ] Warning % only works like Python for +ve num
-	res, err := NewFieldElement(num, fe.prime)
-	if err != nil {
-		panic(err.Error())
-	}
-	return res
+	return NewFieldElement(num, fe.prime)
 }
 
 // Go's % operator is DIFFERENT to Python's % operator
@@ -74,11 +69,7 @@ func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
 		panic("Cannot subtract two numbers in different Fields")
 	}
 	num := mod((fe.num - other.num), fe.prime)
-	res, err := NewFieldElement(num, fe.prime)
-	if err != nil {
-		panic(err.Error())
-	}
-	return res
+	return NewFieldElement(num, fe.prime)
 }
 
 func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
@@ -92,17 +83,13 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 		panic("Cannot multiply two numbers in different Fields")
 	}
 	num := mod((fe.num * other.num), fe.prime)
-	res, err := NewFieldElement(num, fe.prime)
-	if err != nil {
-		panic(err.Error())
-	}
-	return res
+	return NewFieldElement(num, fe.prime)
 }
 
 // Need a pow function with modulus, like in Python
 func pow(base int, exp int, modulus int) int {
 	if exp < 0 {
-		panic("Negative exponent not supported")
+		panic("Negative exponent not supported here")
 	}
 	if exp == 0 {
 		return 1
@@ -120,14 +107,10 @@ func pow(base int, exp int, modulus int) int {
 func (fe *FieldElement) pow(exp int) *FieldElement {
 	n := mod(exp, (fe.prime - 1))
 	num := pow(fe.num, n, fe.prime)
-	res, err := NewFieldElement(num, fe.prime)
-	if err != nil {
-		panic(err.Error)
-	}
-	return res
+	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) truediv(other *FieldElement) *FieldElement {
+func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
@@ -139,9 +122,5 @@ func (fe *FieldElement) truediv(other *FieldElement) *FieldElement {
 	}
 	// Using Fermat's Little Theorem
 	num := mod(fe.num*pow(other.num, fe.prime-2, fe.prime), fe.prime)
-	res, err := NewFieldElement(num, fe.prime)
-	if err != nil {
-		panic(err.Error)
-	}
-	return res
+	return NewFieldElement(num, fe.prime)
 }
