@@ -74,7 +74,6 @@ func TestTrueDiv(t *testing.T) {
 	a, _ := NewFieldElement(3, 31)
 	b, _ := NewFieldElement(24, 31)
 	c, _ := NewFieldElement(4, 31)
-	println(a.truediv(b).repr())
 	if a.truediv(b).ne(c) {
 		t.Fail()
 	}

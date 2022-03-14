@@ -26,8 +26,8 @@ func (fe *FieldElement) repr() string {
 
 // Test for equality
 func (fe *FieldElement) eq(other *FieldElement) bool {
-	if other == nil {
-		return false
+	if fe == nil || other == nil {
+		panic("Cannot compare nil pointers")
 	}
 	return fe.num == other.num && fe.prime == other.prime
 }
@@ -37,6 +37,9 @@ func (fe *FieldElement) ne(other *FieldElement) bool {
 	//panic("Not Implemented")
 
 	// Answer Exercise 1
+	if fe == nil || other == nil {
+		panic("Cannot compare nil pointers")
+	}
 	return !fe.eq(other)
 }
 
@@ -47,7 +50,7 @@ func (fe *FieldElement) add(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot add two numbers in different Fields")
 	}
-	num := (fe.num + other.num) % fe.prime
+	num := (fe.num + other.num) % fe.prime // [  ] Warning % only works like Python for +ve num
 	res, err := NewFieldElement(num, fe.prime)
 	if err != nil {
 		panic(err.Error())
@@ -98,6 +101,9 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 
 // Need a pow function with modulus, like in Python
 func pow(base int, exp int, modulus int) int {
+	if exp < 0 {
+		panic("Negative exponent not supported")
+	}
 	if exp == 0 {
 		return 1
 	} else if exp == 1 {
@@ -131,6 +137,7 @@ func (fe *FieldElement) truediv(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot divide two numbers in different Fields")
 	}
+	// Using Fermat's Little Theorem
 	num := mod(fe.num*pow(other.num, fe.prime-2, fe.prime), fe.prime)
 	res, err := NewFieldElement(num, fe.prime)
 	if err != nil {
