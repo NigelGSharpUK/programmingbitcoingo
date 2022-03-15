@@ -1,6 +1,7 @@
 package ecc
 
 import (
+	"errors"
 	"strconv"
 )
 
@@ -146,6 +147,13 @@ func NewPoint(x, y, a, b int) *Point {
 	return res
 }
 
+func NewPointErr(x, y, a, b int) (*Point, error) {
+	if y*y != x*x*x+a*x+b {
+		return nil, errors.New("Point is not on the curve")
+	}
+	return NewPoint(x, y, a, b), nil
+}
+
 func NewInfPoint(a, b int) *Point {
 	res := new(Point)
 	res.isInf = true
@@ -165,7 +173,7 @@ func (p *Point) ne(other *Point) bool {
 	return !p.eq(other)
 }
 
-func (p *Point) repr() string {
+func (p *Point) Repr() string {
 	if p.isInf {
 		return "Point(infinity)"
 	}
