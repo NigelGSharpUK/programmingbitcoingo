@@ -14,6 +14,8 @@ func main() {
 	exercise5()
 	println("Exercise 6 is in ecc.go")
 	exercise7()
+	exercise8()
+	println("Exercise 9 is in ecc.go")
 }
 
 func exercise2() {
@@ -81,4 +83,12 @@ func exercise7() {
 		s += "}"
 		println(s)
 	}
+}
+
+func exercise8() {
+	println("Exercise 8")
+	prime := 31
+	println(Mod(3*PowMod(24, prime-2, prime), prime))
+	println(PowMod(17, prime-4, prime))
+	println(Mod(11*PowMod(4, prime-5, prime), prime))
 }
