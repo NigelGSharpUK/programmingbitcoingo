@@ -9,6 +9,9 @@ func main() {
 	println("Exercise 2 is in ecc.go")
 	println("Exercise 3 is in ecc.go")
 	exercise4()
+	println("Exercise 5 is in ecc.go")
+	exercise6()
+	println("Exercise 7 is in ecc.go")
 }
 
 func exercise1() {
@@ -46,4 +49,10 @@ func exercise4() {
 	p1 := NewPoint(2, 5, 5, 7)
 	p2 := NewPoint(-1, -1, 5, 7)
 	println(p1.Add(p2).Repr())
+}
+
+func exercise6() {
+	println("Exercise 6")
+	p1 := NewPoint(-1, -1, 5, 7)
+	println(p1.Add(p1).Repr())
 }
