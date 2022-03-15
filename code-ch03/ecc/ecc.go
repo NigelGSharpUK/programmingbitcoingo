@@ -19,12 +19,12 @@ func NewFieldElement(num int, prime int) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) repr() string {
+func (fe *FieldElement) Repr() string {
 	return "FieldElement_" + strconv.Itoa(fe.prime) + "(" + strconv.Itoa(fe.num) + ")"
 }
 
 // Test for equality
-func (fe *FieldElement) eq(other *FieldElement) bool {
+func (fe *FieldElement) Eq(other *FieldElement) bool {
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
@@ -32,17 +32,17 @@ func (fe *FieldElement) eq(other *FieldElement) bool {
 }
 
 // Test for inequality
-func (fe *FieldElement) ne(other *FieldElement) bool {
+func (fe *FieldElement) Ne(other *FieldElement) bool {
 	//panic("Not Implemented")
 
 	// Answer Exercise 1
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
-	return !fe.eq(other)
+	return !fe.Eq(other)
 }
 
-func (fe *FieldElement) add(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Add(other *FieldElement) *FieldElement {
 	if fe == nil || other == nil {
 		panic("Cannot add nil pointers")
 	}
@@ -54,11 +54,11 @@ func (fe *FieldElement) add(other *FieldElement) *FieldElement {
 }
 
 // Go's % operator is DIFFERENT to Python's % operator
-func mod(a, b int) int {
+func Mod(a, b int) int {
 	return (a%b + b) % b
 }
 
-func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Sub(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 3
@@ -68,11 +68,11 @@ func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot subtract two numbers in different Fields")
 	}
-	num := mod((fe.num - other.num), fe.prime)
+	num := Mod((fe.num - other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Mul(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 6
@@ -82,35 +82,35 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot multiply two numbers in different Fields")
 	}
-	num := mod((fe.num * other.num), fe.prime)
+	num := Mod((fe.num * other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
 // Need a pow function with modulus, like in Python
-func powMod(base int, exp int, modulus int) int {
+func PowMod(base int, exp int, modulus int) int {
 	if exp < 0 {
 		panic("Negative exponent not supported here")
 	}
 	if exp == 0 {
 		return 1
 	} else if exp == 1 {
-		return mod(base, modulus)
+		return Mod(base, modulus)
 	} else {
 		res := 1
 		for i := 0; i < exp; i++ {
-			res = mod(res*base, modulus)
+			res = Mod(res*base, modulus)
 		}
 		return res
 	}
 }
 
-func (fe *FieldElement) pow(exp int) *FieldElement {
-	n := mod(exp, (fe.prime - 1))
-	num := powMod(fe.num, n, fe.prime)
+func (fe *FieldElement) Pow(exp int) *FieldElement {
+	n := Mod(exp, (fe.prime - 1))
+	num := PowMod(fe.num, n, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) div(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Div(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
@@ -121,12 +121,12 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	num := mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
+	num := Mod(fe.num*PowMod(other.num, fe.prime-2, fe.prime), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) rmul(coefficient int) *FieldElement {
-	num := mod(fe.num*coefficient, fe.prime)
+func (fe *FieldElement) Rmul(coefficient int) *FieldElement {
+	num := Mod(fe.num*coefficient, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
@@ -145,7 +145,7 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	res.y = y
 	res.a = a
 	res.b = b
-	if y.pow(2).ne(x.pow(3).add(a.mul(x)).add(b)) {
+	if y.Pow(2).Ne(x.Pow(3).Add(a.Mul(x)).Add(b)) {
 		panic("Point is not on the curve")
 	}
 	return res
@@ -159,40 +159,40 @@ func NewInfPoint(a, b *FieldElement) *Point {
 	return res
 }
 
-func (p *Point) eq(other *Point) bool {
-	return p.x.eq(other.x) && p.y.eq(other.y) && p.a.eq(other.a) && p.b.eq(other.b)
+func (p *Point) Eq(other *Point) bool {
+	return p.x.Eq(other.x) && p.y.Eq(other.y) && p.a.Eq(other.a) && p.b.Eq(other.b)
 }
 
-func (p *Point) ne(other *Point) bool {
+func (p *Point) Ne(other *Point) bool {
 	//panic("Not Implemented")
 
 	// Exercise 2 answer
-	return !p.eq(other)
+	return !p.Eq(other)
 }
 
-func (p *Point) repr() string {
+func (p *Point) Repr() string {
 	if p.isInf {
 		return "Point(infinity)"
 	}
-	return "Point(" + p.x.repr() + "," + p.y.repr() + ")_" + p.a.repr() + "_" + p.b.repr()
+	return "Point(" + p.x.Repr() + "," + p.y.Repr() + ")_" + p.a.Repr() + "_" + p.b.Repr()
 }
 
-func (p *Point) rmul(coefficient int) *Point {
+func (p *Point) Rmul(coefficient int) *Point {
 	coef := coefficient
 	current := p
 	result := NewInfPoint(p.a, p.b) // Point at infinity acts as zero
 	for coef != 0 {
 		if coef&1 == 1 {
-			result = result.add(current)
+			result = result.Add(current)
 		}
-		current = current.add(current)
+		current = current.Add(current)
 		coef >>= 1
 	}
 	return result
 }
 
-func (p *Point) add(other *Point) *Point {
-	if p.a.ne(other.a) || p.b.ne(other.b) {
+func (p *Point) Add(other *Point) *Point {
+	if p.a.Ne(other.a) || p.b.Ne(other.b) {
 		panic("Can't add points that are not on same curve")
 	}
 	if p.isInf {
@@ -205,7 +205,7 @@ func (p *Point) add(other *Point) *Point {
 	}
 
 	// Handle p==other and y==0 (vertical tangent)
-	if p.eq(other) && p.y.num == 0 {
+	if p.Eq(other) && p.y.num == 0 {
 		return NewInfPoint(p.a, p.b)
 	}
 
@@ -214,7 +214,7 @@ func (p *Point) add(other *Point) *Point {
 	// panic("Not implemented")
 
 	// Answer Exercise 3
-	if p.x.eq(other.x) && p.y.ne(other.y) {
+	if p.x.Eq(other.x) && p.y.Ne(other.y) {
 		return NewInfPoint(p.a, p.b)
 	}
 
@@ -223,13 +223,13 @@ func (p *Point) add(other *Point) *Point {
 	// s=(y2-y1)/(x2-x1)
 	// x3=s**2-x1-x2
 	// y3=s*(x1-x3)-y1
-	if p.x.ne(other.x) {
+	if p.x.Ne(other.x) {
 		// panic( "Not implemented")
 
 		// Answer Exercise 5
-		s := other.y.sub(p.y).div(other.x.sub(p.x))
-		x3 := s.pow(2).sub(p.x).sub(other.x)
-		y3 := s.mul(p.x.sub(x3)).sub(p.y)
+		s := other.y.Sub(p.y).Div(other.x.Sub(p.x))
+		x3 := s.Pow(2).Sub(p.x).Sub(other.x)
+		y3 := s.Mul(p.x.Sub(x3)).Sub(p.y)
 		return NewPoint(x3, y3, p.a, p.b)
 	}
 
@@ -242,10 +242,10 @@ func (p *Point) add(other *Point) *Point {
 
 	// Answer Exercise 7
 	// Handle p,other being same point, so use tangent
-	if p.x.eq(other.x) && p.y.eq(other.y) {
-		s := p.x.pow(2).rmul(3).add(p.a).div(p.y.rmul(2))
-		x3 := s.pow(2).sub(p.x.rmul(2))
-		y3 := s.mul(p.x.sub(x3)).sub(p.y)
+	if p.x.Eq(other.x) && p.y.Eq(other.y) {
+		s := p.x.Pow(2).Rmul(3).Add(p.a).Div(p.y.Rmul(2))
+		x3 := s.Pow(2).Sub(p.x.Rmul(2))
+		y3 := s.Mul(p.x.Sub(x3)).Sub(p.y)
 		return NewPoint(x3, y3, p.a, p.b)
 	}
 

@@ -20,12 +20,12 @@ func NewFieldElement(num int, prime int) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) repr() string {
+func (fe *FieldElement) Repr() string {
 	return "FieldElement_" + strconv.Itoa(fe.prime) + "(" + strconv.Itoa(fe.num) + ")"
 }
 
 // Test for equality
-func (fe *FieldElement) eq(other *FieldElement) bool {
+func (fe *FieldElement) Eq(other *FieldElement) bool {
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
@@ -33,17 +33,17 @@ func (fe *FieldElement) eq(other *FieldElement) bool {
 }
 
 // Test for inequality
-func (fe *FieldElement) ne(other *FieldElement) bool {
+func (fe *FieldElement) Ne(other *FieldElement) bool {
 	//panic("Not Implemented")
 
 	// Answer Exercise 1
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
-	return !fe.eq(other)
+	return !fe.Eq(other)
 }
 
-func (fe *FieldElement) add(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Add(other *FieldElement) *FieldElement {
 	if fe == nil || other == nil {
 		panic("Cannot add nil pointers")
 	}
@@ -55,11 +55,11 @@ func (fe *FieldElement) add(other *FieldElement) *FieldElement {
 }
 
 // Go's % operator is DIFFERENT to Python's % operator
-func mod(a, b int) int {
+func Mod(a, b int) int {
 	return (a%b + b) % b
 }
 
-func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Sub(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 3
@@ -69,11 +69,11 @@ func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot subtract two numbers in different Fields")
 	}
-	num := mod((fe.num - other.num), fe.prime)
+	num := Mod((fe.num - other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Mul(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 6
@@ -83,35 +83,35 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot multiply two numbers in different Fields")
 	}
-	num := mod((fe.num * other.num), fe.prime)
+	num := Mod((fe.num * other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
 // Need a pow function with modulus, like in Python
-func powMod(base int, exp int, modulus int) int {
+func PowMod(base int, exp int, modulus int) int {
 	if exp < 0 {
 		panic("Negative exponent not supported here")
 	}
 	if exp == 0 {
 		return 1
 	} else if exp == 1 {
-		return mod(base, modulus)
+		return Mod(base, modulus)
 	} else {
 		res := 1
 		for i := 0; i < exp; i++ {
-			res = mod(res*base, modulus)
+			res = Mod(res*base, modulus)
 		}
 		return res
 	}
 }
 
-func (fe *FieldElement) pow(exp int) *FieldElement {
-	n := mod(exp, (fe.prime - 1))
-	num := powMod(fe.num, n, fe.prime)
+func (fe *FieldElement) Pow(exp int) *FieldElement {
+	n := Mod(exp, (fe.prime - 1))
+	num := PowMod(fe.num, n, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) div(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Div(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
@@ -122,7 +122,7 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	num := mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
+	num := Mod(fe.num*PowMod(other.num, fe.prime-2, fe.prime), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
@@ -162,15 +162,15 @@ func NewInfPoint(a, b int) *Point {
 	return res
 }
 
-func (p *Point) eq(other *Point) bool {
+func (p *Point) Eq(other *Point) bool {
 	return p.x == other.x && p.y == other.y && p.a == other.a && p.b == other.b
 }
 
-func (p *Point) ne(other *Point) bool {
+func (p *Point) Ne(other *Point) bool {
 	//panic("Not Implemented")
 
 	// Exercise 2 answer
-	return !p.eq(other)
+	return !p.Eq(other)
 }
 
 func (p *Point) Repr() string {
@@ -194,7 +194,7 @@ func (p *Point) Add(other *Point) *Point {
 	}
 
 	// Handle p==other and y==0 (vertical tangent)
-	if p.eq(other) && p.y == 0 {
+	if p.Eq(other) && p.y == 0 {
 		return NewInfPoint(p.a, p.b)
 	}
 
