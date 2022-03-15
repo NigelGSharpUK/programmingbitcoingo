@@ -131,13 +131,13 @@ func TestPointAdd0(t *testing.T) {
 	a := NewInfPoint(5, 7)
 	b := NewPoint(2, 5, 5, 7)
 	c := NewPoint(2, -5, 5, 7)
-	if a.add(b).ne(b) {
+	if a.Add(b).ne(b) {
 		t.Fail()
 	}
-	if b.add(a).ne(b) {
+	if b.Add(a).ne(b) {
 		t.Fail()
 	}
-	if b.add(c).ne(a) {
+	if b.Add(c).ne(a) {
 		t.Fail()
 	}
 }
@@ -145,14 +145,14 @@ func TestPointAdd0(t *testing.T) {
 func TestPointAdd1(t *testing.T) {
 	a := NewPoint(3, 7, 5, 7)
 	b := NewPoint(-1, -1, 5, 7)
-	if a.add(b).ne(NewPoint(2, -5, 5, 7)) {
+	if a.Add(b).ne(NewPoint(2, -5, 5, 7)) {
 		t.Fail()
 	}
 }
 
 func TestPointAdd2(t *testing.T) {
 	a := NewPoint(-1, -1, 5, 7)
-	if a.add(a).ne(NewPoint(18, 77, 5, 7)) {
+	if a.Add(a).ne(NewPoint(18, 77, 5, 7)) {
 		t.Fail()
 	}
 }

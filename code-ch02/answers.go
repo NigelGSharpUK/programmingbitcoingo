@@ -6,6 +6,9 @@ import (
 
 func main() {
 	exercise1()
+	println("Exercise 2 is in ecc.go")
+	println("Exercise 3 is in ecc.go")
+	exercise4()
 }
 
 func exercise1() {
@@ -36,4 +39,11 @@ func exercise1() {
 	} else {
 		println("Point is on the curve: ", p.Repr())
 	}
+}
+
+func exercise4() {
+	println("Exercise 4")
+	p1 := NewPoint(2, 5, 5, 7)
+	p2 := NewPoint(-1, -1, 5, 7)
+	println(p1.Add(p2).Repr())
 }

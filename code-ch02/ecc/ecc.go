@@ -180,7 +180,7 @@ func (p *Point) Repr() string {
 	return "Point(" + strconv.Itoa(p.x) + "," + strconv.Itoa(p.y) + ")_" + strconv.Itoa(p.a) + "_" + strconv.Itoa(p.b)
 }
 
-func (p *Point) add(other *Point) *Point {
+func (p *Point) Add(other *Point) *Point {
 	if p.a != other.a || p.b != other.b {
 		panic("Can't add points that are not on same curve")
 	}
