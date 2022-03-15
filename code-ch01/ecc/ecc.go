@@ -19,12 +19,12 @@ func NewFieldElement(num int, prime int) *FieldElement {
 	return fe
 }
 
-func (fe *FieldElement) repr() string {
+func (fe *FieldElement) Repr() string {
 	return "FieldElement_" + strconv.Itoa(fe.prime) + "(" + strconv.Itoa(fe.num) + ")"
 }
 
 // Test for equality
-func (fe *FieldElement) eq(other *FieldElement) bool {
+func (fe *FieldElement) Eq(other *FieldElement) bool {
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
@@ -32,17 +32,17 @@ func (fe *FieldElement) eq(other *FieldElement) bool {
 }
 
 // Test for inequality
-func (fe *FieldElement) ne(other *FieldElement) bool {
+func (fe *FieldElement) Ne(other *FieldElement) bool {
 	//panic("Not Implemented")
 
 	// Answer Exercise 1
 	if fe == nil || other == nil {
 		panic("Cannot compare nil pointers")
 	}
-	return !fe.eq(other)
+	return !fe.Eq(other)
 }
 
-func (fe *FieldElement) add(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Add(other *FieldElement) *FieldElement {
 	if fe == nil || other == nil {
 		panic("Cannot add nil pointers")
 	}
@@ -58,7 +58,7 @@ func Mod(a, b int) int {
 	return (a%b + b) % b
 }
 
-func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Sub(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 3
@@ -72,7 +72,7 @@ func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Mul(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 6
@@ -87,7 +87,7 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 }
 
 // Need a pow function with modulus, like in Python
-func powMod(base int, exp int, modulus int) int {
+func PowMod(base int, exp int, modulus int) int {
 	if exp < 0 {
 		panic("Negative exponent not supported here")
 	}
@@ -104,13 +104,13 @@ func powMod(base int, exp int, modulus int) int {
 	}
 }
 
-func (fe *FieldElement) pow(exp int) *FieldElement {
+func (fe *FieldElement) Pow(exp int) *FieldElement {
 	n := Mod(exp, (fe.prime - 1))
-	num := powMod(fe.num, n, fe.prime)
+	num := PowMod(fe.num, n, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
-func (fe *FieldElement) div(other *FieldElement) *FieldElement {
+func (fe *FieldElement) Div(other *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
@@ -121,6 +121,6 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	num := Mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
+	num := Mod(fe.num*PowMod(other.num, fe.prime-2, fe.prime), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
