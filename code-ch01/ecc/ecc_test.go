@@ -31,19 +31,19 @@ func TestAdd(t *testing.T) {
 }
 
 func TestMod(t *testing.T) {
-	if mod(0, 1) != 0 {
+	if Mod(0, 1) != 0 {
 		t.Fail()
 	}
-	if mod(0, 2) != 0 {
+	if Mod(0, 2) != 0 {
 		t.Fail()
 	}
-	if mod(1, 2) != 1 {
+	if Mod(1, 2) != 1 {
 		t.Fail()
 	}
-	if mod(2, 2) != 0 {
+	if Mod(2, 2) != 0 {
 		t.Fail()
 	}
-	if mod(-1, 2) != 1 {
+	if Mod(-1, 2) != 1 {
 		t.Fail()
 	}
 }

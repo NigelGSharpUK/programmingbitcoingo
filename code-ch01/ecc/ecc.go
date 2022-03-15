@@ -54,7 +54,7 @@ func (fe *FieldElement) add(other *FieldElement) *FieldElement {
 }
 
 // Go's % operator is DIFFERENT to Python's % operator
-func mod(a, b int) int {
+func Mod(a, b int) int {
 	return (a%b + b) % b
 }
 
@@ -68,7 +68,7 @@ func (fe *FieldElement) sub(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot subtract two numbers in different Fields")
 	}
-	num := mod((fe.num - other.num), fe.prime)
+	num := Mod((fe.num - other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
@@ -82,7 +82,7 @@ func (fe *FieldElement) mul(other *FieldElement) *FieldElement {
 	if fe.prime != other.prime {
 		panic("Cannot multiply two numbers in different Fields")
 	}
-	num := mod((fe.num * other.num), fe.prime)
+	num := Mod((fe.num * other.num), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
 
@@ -94,18 +94,18 @@ func powMod(base int, exp int, modulus int) int {
 	if exp == 0 {
 		return 1
 	} else if exp == 1 {
-		return mod(base, modulus)
+		return Mod(base, modulus)
 	} else {
 		res := 1
 		for i := 0; i < exp; i++ {
-			res = mod(res*base, modulus)
+			res = Mod(res*base, modulus)
 		}
 		return res
 	}
 }
 
 func (fe *FieldElement) pow(exp int) *FieldElement {
-	n := mod(exp, (fe.prime - 1))
+	n := Mod(exp, (fe.prime - 1))
 	num := powMod(fe.num, n, fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
@@ -121,6 +121,6 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	num := mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
+	num := Mod(fe.num*powMod(other.num, fe.prime-2, fe.prime), fe.prime)
 	return NewFieldElement(num, fe.prime)
 }
