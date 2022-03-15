@@ -6,6 +6,7 @@ import (
 
 func main() {
 	exercise1()
+	exercise2()
 }
 
 func on_curve(x, y, a, b *FieldElement) bool {
@@ -22,4 +23,20 @@ func exercise1() {
 	println(on_curve(NewFieldElement(200, prime), NewFieldElement(119, prime), a, b))
 	println(on_curve(NewFieldElement(1, prime), NewFieldElement(193, prime), a, b))
 	println(on_curve(NewFieldElement(42, prime), NewFieldElement(99, prime), a, b))
+}
+
+func exercise2() {
+	println("Exercise 2")
+	const prime = 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	x := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
+	y := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
+	println(x.Add(y).Repr())
+	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	y = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
+	println(x.Add(y).Repr())
+	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
+	y = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
+	println(x.Add(y).Repr())
 }
