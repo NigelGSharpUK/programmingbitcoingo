@@ -9,6 +9,7 @@ func main() {
 	exercise2()
 	println("Exercise 3 is in ecc_test.go")
 	exercise4()
+	exercise5()
 }
 
 func on_curve(x, y, a, b *FieldElement) bool {
@@ -65,4 +66,23 @@ func exercise4() {
 		x = x.Add(origx)
 	}
 	println(x.Repr()) // *21
+}
+
+func exercise5() {
+	println("Exercise 5")
+	const prime = 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	origx := NewPoint(NewFieldElement(15, prime), NewFieldElement(86, prime), a, b)
+	inf := NewInfPoint(a, b)
+	x := NewInfPoint(a, b)
+	var order int
+	for i := 1; true; i++ {
+		x = x.Add(origx)
+		if x.Eq(inf) {
+			order = i
+			break
+		}
+	}
+	println("Order of group generated:", order)
 }

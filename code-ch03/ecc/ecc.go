@@ -160,6 +160,16 @@ func NewInfPoint(a, b *FieldElement) *Point {
 }
 
 func (p *Point) Eq(other *Point) bool {
+	// First check for both infinities
+	if p.isInf && other.isInf {
+		return p.a.Eq(other.a) && p.b.Eq(other.b)
+	}
+	// Then check for one or other infinities
+	if p.isInf || other.isInf {
+		// We know they're not both infinity
+		return false
+	}
+	// Now we're safe to compare FiniteFields
 	return p.x.Eq(other.x) && p.y.Eq(other.y) && p.a.Eq(other.a) && p.b.Eq(other.b)
 }
 

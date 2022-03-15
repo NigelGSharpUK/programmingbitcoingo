@@ -199,3 +199,24 @@ func TestEccAdd(t *testing.T) {
 		t.Fail()
 	}
 }
+
+// We must be able to compare with inf (we found that we couldn't at first!)
+func TestInfCompare(t *testing.T) {
+	prime := 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	infx := NewInfPoint(a, b)
+	infy := NewInfPoint(a, b)
+	if infx.Ne(infy) {
+		t.Fail()
+	}
+	x := NewFieldElement(15, prime)
+	y := NewFieldElement(86, prime)
+	z := NewPoint(x, y, a, b)
+	if infx.Eq(z) {
+		t.Fail()
+	}
+	if z.Eq(infy) {
+		t.Fail()
+	}
+}
