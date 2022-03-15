@@ -7,6 +7,8 @@ import (
 func main() {
 	exercise1()
 	exercise2()
+	println("Exercise 3 is in ecc_test.go")
+	exercise4()
 }
 
 func on_curve(x, y, a, b *FieldElement) bool {
@@ -39,4 +41,28 @@ func exercise2() {
 	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
 	y = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
 	println(x.Add(y).Repr())
+}
+
+func exercise4() {
+	println("Exercise 4")
+	const prime = 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	x := NewPoint(NewFieldElement(192, prime), NewFieldElement(105, prime), a, b)
+	println(x.Add(x).Repr())
+	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
+	println(x.Add(x).Repr())
+	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	x = x.Add(x)
+	println(x.Repr()) // *2
+	x = x.Add(x)
+	println(x.Repr()) // *4
+	x = x.Add(x)
+	println(x.Repr()) // *8
+	origx := NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	x = NewInfPoint(a, b)
+	for i := 0; i < 21; i++ {
+		x = x.Add(origx)
+	}
+	println(x.Repr()) // *21
 }
