@@ -125,28 +125,33 @@ func (fe *FieldElement) div(other *FieldElement) *FieldElement {
 	return NewFieldElement(num, fe.prime)
 }
 
-type Point struct {
-	isInf bool
-	x     int // ignore if isInf
-	y     int // ignore if isInf
-	a     int
-	b     int
+func (fe *FieldElement) rmul(coefficient int) *FieldElement {
+	num := mod(fe.num*coefficient, fe.prime)
+	return NewFieldElement(num, fe.prime)
 }
 
-func NewPoint(x, y, a, b int) *Point {
+type Point struct {
+	isInf bool
+	x     *FieldElement // ignore if isInf
+	y     *FieldElement // ignore if isInf
+	a     *FieldElement
+	b     *FieldElement
+}
+
+func NewPoint(x, y, a, b *FieldElement) *Point {
 	res := new(Point)
 	res.isInf = false
 	res.x = x
 	res.y = y
 	res.a = a
 	res.b = b
-	if y*y != x*x*x+a*x+b {
+	if y.pow(2).ne(x.pow(3).add(a.mul(x)).add(b)) {
 		panic("Point is not on the curve")
 	}
 	return res
 }
 
-func NewInfPoint(a, b int) *Point {
+func NewInfPoint(a, b *FieldElement) *Point {
 	res := new(Point)
 	res.isInf = true
 	res.a = a
@@ -155,7 +160,7 @@ func NewInfPoint(a, b int) *Point {
 }
 
 func (p *Point) eq(other *Point) bool {
-	return p.x == other.x && p.y == other.y && p.a == other.a && p.b == other.b
+	return p.x.eq(other.x) && p.y.eq(other.y) && p.a.eq(other.a) && p.b.eq(other.b)
 }
 
 func (p *Point) ne(other *Point) bool {
@@ -169,11 +174,25 @@ func (p *Point) repr() string {
 	if p.isInf {
 		return "Point(infinity)"
 	}
-	return "Point(" + strconv.Itoa(p.x) + "," + strconv.Itoa(p.y) + ")_" + strconv.Itoa(p.a) + "_" + strconv.Itoa(p.b)
+	return "Point(" + p.x.repr() + "," + p.y.repr() + ")_" + p.a.repr() + "_" + p.b.repr()
+}
+
+func (p *Point) rmul(coefficient int) *Point {
+	coef := coefficient
+	current := p
+	result := NewInfPoint(p.a, p.b) // Point at infinity acts as zero
+	for coef != 0 {
+		if coef&1 == 1 {
+			result = result.add(current)
+		}
+		current = current.add(current)
+		coef >>= 1
+	}
+	return result
 }
 
 func (p *Point) add(other *Point) *Point {
-	if p.a != other.a || p.b != other.b {
+	if p.a.ne(other.a) || p.b.ne(other.b) {
 		panic("Can't add points that are not on same curve")
 	}
 	if p.isInf {
@@ -186,7 +205,7 @@ func (p *Point) add(other *Point) *Point {
 	}
 
 	// Handle p==other and y==0 (vertical tangent)
-	if p.eq(other) && p.y == 0 {
+	if p.eq(other) && p.y.num == 0 {
 		return NewInfPoint(p.a, p.b)
 	}
 
@@ -195,7 +214,7 @@ func (p *Point) add(other *Point) *Point {
 	// panic("Not implemented")
 
 	// Answer Exercise 3
-	if p.x == other.x && p.y != other.y {
+	if p.x.eq(other.x) && p.y.ne(other.y) {
 		return NewInfPoint(p.a, p.b)
 	}
 
@@ -204,13 +223,13 @@ func (p *Point) add(other *Point) *Point {
 	// s=(y2-y1)/(x2-x1)
 	// x3=s**2-x1-x2
 	// y3=s*(x1-x3)-y1
-	if p.x != other.x {
+	if p.x.ne(other.x) {
 		// panic( "Not implemented")
 
 		// Answer Exercise 5
-		s := float64(other.y-p.y) / float64(other.x-p.x)
-		x3 := int(s*s - float64(p.x) - float64(other.x))
-		y3 := int(s*float64(p.x-x3)) - p.y
+		s := other.y.sub(p.y).div(other.x.sub(p.x))
+		x3 := s.pow(2).sub(p.x).sub(other.x)
+		y3 := s.mul(p.x.sub(x3)).sub(p.y)
 		return NewPoint(x3, y3, p.a, p.b)
 	}
 
@@ -223,15 +242,15 @@ func (p *Point) add(other *Point) *Point {
 
 	// Answer Exercise 7
 	// Handle p,other being same point, so use tangent
-	if p.x == other.x && p.y == other.y {
-		s := (3*p.x*p.x + p.a) / (2 * p.y)
-		x3 := s*s - 2*p.x
-		y3 := s*(p.x-x3) - p.y
+	if p.x.eq(other.x) && p.y.eq(other.y) {
+		s := p.x.pow(2).rmul(3).add(p.a).div(p.y.rmul(2))
+		x3 := s.pow(2).sub(p.x.rmul(2))
+		y3 := s.mul(p.x.sub(x3)).sub(p.y)
 		return NewPoint(x3, y3, p.a, p.b)
 	}
 
 	// Final case, tangent is vertical
-	if p.x == other.x && p.y == 0 {
+	if p.x == other.x && p.y.num == 0 {
 		return NewInfPoint(p.a, p.b)
 	}
 

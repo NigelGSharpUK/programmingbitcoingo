@@ -116,6 +116,8 @@ func TestDiv(t *testing.T) {
 	}
 }
 
+/*
+// These test are no longer valid now that NewPoint takes FieldElements
 func TestPointNe(t *testing.T) {
 	a := NewPoint(3, 7, 5, 7)
 	b := NewPoint(18, 77, 5, 7)
@@ -153,6 +155,46 @@ func TestPointAdd1(t *testing.T) {
 func TestPointAdd2(t *testing.T) {
 	a := NewPoint(-1, -1, 5, 7)
 	if a.add(a).ne(NewPoint(18, 77, 5, 7)) {
+		t.Fail()
+	}
+}
+*/
+
+func TestEccTestOnCurve(t *testing.T) {
+	prime := 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	//https://golang.org/ref/spec#Composite_literals
+	valid_points := [][]int{{192, 105}, {17, 56}, {1, 193}}
+	//invalid_points := [][]int{{200, 119}, {42, 99}}
+	for _, point := range valid_points {
+		x := NewFieldElement(point[0], prime)
+		y := NewFieldElement(point[1], prime)
+		p := NewPoint(x, y, a, b)
+		println(p.repr())
+	}
+}
+
+func TestEccAdd(t *testing.T) {
+	prime := 223
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	p1 := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
+	p2 := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
+	sum := NewPoint(NewFieldElement(220, prime), NewFieldElement(181, prime), a, b)
+	if p1.add(p2).ne(sum) {
+		t.Fail()
+	}
+	p1 = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	p2 = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
+	sum = NewPoint(NewFieldElement(215, prime), NewFieldElement(68, prime), a, b)
+	if p1.add(p2).ne(sum) {
+		t.Fail()
+	}
+	p1 = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
+	p2 = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
+	sum = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	if p1.add(p2).ne(sum) {
 		t.Fail()
 	}
 }
