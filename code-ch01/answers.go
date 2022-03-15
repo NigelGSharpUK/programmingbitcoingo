@@ -2,6 +2,8 @@ package main
 
 import (
 	. "programmingbitcoingo/code-ch01/ecc"
+	"sort"
+	"strconv"
 )
 
 func main() {
@@ -9,6 +11,7 @@ func main() {
 	exercise2()
 	println("Exercise 3 is in ecc.go")
 	exercise4()
+	exercise5()
 }
 
 func exercise2() {
@@ -31,4 +34,31 @@ func exercise4() {
 	println(Mod(17*13*19*44, prime))
 	// Good idea to use a new PowMod() function designed to work like Python's 3 argument fn
 	println(Mod(PowMod(12, 7, prime)*PowMod(77, 49, prime), prime))
+}
+
+func exercise5() {
+	println("Exercise 5")
+	const prime = 19
+	ks := []int{1, 3, 7, 13, 18}
+	for _, k := range ks {
+		println("k=", k)
+		set := make(map[int]bool)
+		for i := 0; i < prime; i++ {
+			set[Mod(k*i, prime)] = true
+		}
+		var array [prime]int
+		j := 0
+		for key, _ := range set {
+			array[j] = key
+			j++
+		}
+		slice := array[:]
+		sort.Ints(slice)
+		s := "{"
+		for _, val := range slice {
+			s += strconv.Itoa(val) + ", "
+		}
+		s += "}"
+		println(s)
+	}
 }
