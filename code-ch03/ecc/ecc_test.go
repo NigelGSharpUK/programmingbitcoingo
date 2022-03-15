@@ -175,6 +175,7 @@ func TestEccTestOnCurve(t *testing.T) {
 	}
 }
 
+// Answer Exercise 3
 func TestEccAdd(t *testing.T) {
 	prime := 223
 	a := NewFieldElement(0, prime)
