@@ -12,6 +12,8 @@ func main() {
 	println("Exercise 3 is in ecc.go")
 	exercise4()
 	exercise5()
+	println("Exercise 6 is in ecc.go")
+	exercise7()
 }
 
 func exercise2() {
@@ -54,6 +56,24 @@ func exercise5() {
 		}
 		slice := array[:]
 		sort.Ints(slice)
+		s := "{"
+		for _, val := range slice {
+			s += strconv.Itoa(val) + ", "
+		}
+		s += "}"
+		println(s)
+	}
+}
+
+func exercise7() {
+	println("Exercise 7")
+	ps := []int{7, 11, 17, 31}
+	for _, p := range ps {
+		println("p =", p)
+		slice := []int{}
+		for i := 1; i < p; i++ {
+			slice = append(slice, PowMod(i, p-1, p))
+		}
 		s := "{"
 		for _, val := range slice {
 			s += strconv.Itoa(val) + ", "
