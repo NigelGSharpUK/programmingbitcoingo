@@ -179,16 +179,17 @@ func (z *FieldElement) Mul(x, y *FieldElement) *FieldElement {
 	return z
 }
 
-func (fe *FieldElement) Pow(exp *big.Int) *FieldElement {
-	//n := Mod(exp, (fe.prime - 1))		[  ] Really? -1?
+// Now implements interface similar in style to big.Int
+func (z *FieldElement) Exp(x *FieldElement, y *big.Int) *FieldElement {
+	//n := exp % (x.prime - 1))
 	var primeMinusOne big.Int
-	primeMinusOne.Sub(&fe.prime, big.NewInt(1))
+	primeMinusOne.Sub(&x.prime, big.NewInt(1))
 	var n big.Int
-	n.Mod(exp, &primeMinusOne)
-	//num := PowMod(fe.num, n, fe.prime)
-	var num big.Int
-	num.Exp(&fe.num, &n, &fe.prime)
-	return NewFieldElementBig(&num, &fe.prime)
+	n.Mod(y, &primeMinusOne)
+	//num := Pow(x.num, n, x.prime)
+	z.num.Exp(&x.num, &n, &x.prime)
+	z.prime.Set(&x.prime)
+	return z
 }
 
 func (fe *FieldElement) Div(other *FieldElement) *FieldElement {
@@ -246,12 +247,14 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	res.a.Set(a)
 	res.b.Set(b)
 	//if y^2 != x^3 + ax + b
-	lhs := y.Pow(big.NewInt(2))
-	xcubed := x.Pow(big.NewInt(3))
+	var lhs FieldElement
+	lhs.Exp(y, big.NewInt(2))
+	var xcubed FieldElement
+	xcubed.Exp(x, big.NewInt(3))
 	var ax FieldElement
 	ax.Mul(a, x)
 	var xCubedPlusAx FieldElement
-	xCubedPlusAx.Add(xcubed, &ax)
+	xCubedPlusAx.Add(&xcubed, &ax)
 	var rhs FieldElement
 	rhs.Add(&xCubedPlusAx, b)
 	if !lhs.Eq(&rhs) {
@@ -378,9 +381,10 @@ func (p *Point) Add(other *Point) *Point {
 		xdiff.Sub(&other.x, &p.x)
 		s := ydiff.Div(&xdiff)
 
-		ssquared := s.Pow(big.NewInt(2))
+		var ssquared FieldElement
+		ssquared.Exp(s, big.NewInt(2))
 		var ssquaredMinusX1 FieldElement
-		ssquaredMinusX1.Sub(ssquared, &p.x)
+		ssquaredMinusX1.Sub(&ssquared, &p.x)
 		var x3 FieldElement
 		x3.Sub(&ssquaredMinusX1, &other.x)
 
@@ -404,15 +408,18 @@ func (p *Point) Add(other *Point) *Point {
 	// Answer Exercise 7
 	// Handle p,other being same point, so use tangent
 	if p.x.Eq(&other.x) && p.y.Eq(&other.y) {
-		x1squaredTimesThree := p.x.Pow(big.NewInt(2)).Rmul(big.NewInt(3))
+		var x1squared FieldElement
+		x1squared.Exp(&p.x, big.NewInt(2))
+		x1squaredTimesThree := x1squared.Rmul(big.NewInt(3))
 		var x1squaredTimesThreePlusA FieldElement
 		x1squaredTimesThreePlusA.Add(x1squaredTimesThree, &p.a)
 		s := x1squaredTimesThreePlusA.Div(p.y.Rmul(big.NewInt(2)))
 
-		ssquared := s.Pow(big.NewInt(2))
+		var ssquared FieldElement
+		ssquared.Exp(s, big.NewInt(2))
 		twox1 := p.x.Rmul(big.NewInt(2))
 		var x3 FieldElement
-		x3.Sub(ssquared, twox1)
+		x3.Sub(&ssquared, twox1)
 
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
