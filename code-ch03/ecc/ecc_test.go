@@ -36,12 +36,15 @@ func TestAdd(t *testing.T) {
 func TestSub(t *testing.T) {
 	a := NewFieldElement(29, 31)
 	b := NewFieldElement(4, 31)
-	if !a.Sub(b).Eq(NewFieldElement(25, 31)) {
+	var c FieldElement
+	c.Sub(a, b)
+	if !c.Eq(NewFieldElement(25, 31)) {
 		t.Fail()
 	}
 	a = NewFieldElement(15, 31)
 	b = NewFieldElement(30, 31)
-	if !a.Sub(b).Eq(NewFieldElement(16, 31)) {
+	c.Sub(a, b)
+	if !c.Eq(NewFieldElement(16, 31)) {
 		t.Fail()
 	}
 }

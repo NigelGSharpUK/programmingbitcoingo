@@ -134,22 +134,26 @@ func (z *FieldElement) Add(x, y *FieldElement) *FieldElement {
 	return z
 }
 
-func (fe *FieldElement) Sub(other *FieldElement) *FieldElement {
+// Now implements interface similar in style to big.Int
+func (z *FieldElement) Sub(x, y *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 3
-	if fe == nil || other == nil {
+	if z == nil {
+		panic("Cannot write to nil pointer")
+	}
+	if x == nil || y == nil {
 		panic("Cannot subtract nil pointers")
 	}
-	//if fe.prime != other.prime {
-	if fe.prime.Cmp(&other.prime) != 0 {
+	if x.prime.Cmp(&y.prime) != 0 {
 		panic("Cannot subtract two numbers in different Fields")
 	}
-	//num := Mod((fe.num - other.num), fe.prime)
-	var num big.Int
-	num.Sub(&fe.num, &other.num)
-	num.Mod(&num, &fe.prime)
-	return NewFieldElementBig(&num, &fe.prime)
+	//num := (x.num - y.num) % x.prime
+	var diff big.Int
+	diff.Sub(&x.num, &y.num)
+	z.num.Mod(&diff, &x.prime)
+	z.prime.Set(&x.prime)
+	return z
 }
 
 func (fe *FieldElement) Mul(other *FieldElement) *FieldElement {
@@ -362,10 +366,25 @@ func (p *Point) Add(other *Point) *Point {
 		// panic( "Not implemented")
 
 		// Answer Exercise 5
-		s := other.y.Sub(&p.y).Div(other.x.Sub(&p.x))
-		x3 := s.Pow(big.NewInt(2)).Sub(&p.x).Sub(&other.x)
-		y3 := s.Mul(p.x.Sub(x3)).Sub(&p.y)
-		return NewPoint(x3, y3, &p.a, &p.b)
+		var ydiff FieldElement
+		ydiff.Sub(&other.y, &p.y)
+		var xdiff FieldElement
+		xdiff.Sub(&other.x, &p.x)
+		s := ydiff.Div(&xdiff)
+
+		ssquared := s.Pow(big.NewInt(2))
+		var ssquaredMinusX1 FieldElement
+		ssquaredMinusX1.Sub(ssquared, &p.x)
+		var x3 FieldElement
+		x3.Sub(&ssquaredMinusX1, &other.x)
+
+		var x1MinusX3 FieldElement
+		x1MinusX3.Sub(&p.x, &x3)
+		sTimesX1MinusX3 := s.Mul(&x1MinusX3)
+		var y3 FieldElement
+		y3.Sub(sTimesX1MinusX3, &p.y)
+
+		return NewPoint(&x3, &y3, &p.a, &p.b)
 	}
 
 	// Case 3: self == other
@@ -382,9 +401,19 @@ func (p *Point) Add(other *Point) *Point {
 		var x1squaredTimesThreePlusA FieldElement
 		x1squaredTimesThreePlusA.Add(x1squaredTimesThree, &p.a)
 		s := x1squaredTimesThreePlusA.Div(p.y.Rmul(big.NewInt(2)))
-		x3 := s.Pow(big.NewInt(2)).Sub(p.x.Rmul(big.NewInt(2)))
-		y3 := s.Mul(p.x.Sub(x3)).Sub(&p.y)
-		return NewPoint(x3, y3, &p.a, &p.b)
+
+		ssquared := s.Pow(big.NewInt(2))
+		twox1 := p.x.Rmul(big.NewInt(2))
+		var x3 FieldElement
+		x3.Sub(ssquared, twox1)
+
+		var x1MinusX3 FieldElement
+		x1MinusX3.Sub(&p.x, &x3)
+		sTimesX1MinusX3 := s.Mul(&x1MinusX3)
+		var y3 FieldElement
+		y3.Sub(sTimesX1MinusX3, &p.y)
+
+		return NewPoint(&x3, &y3, &p.a, &p.b)
 	}
 
 	// Final case, tangent is vertical
