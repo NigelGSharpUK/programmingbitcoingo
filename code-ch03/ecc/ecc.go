@@ -156,22 +156,27 @@ func (z *FieldElement) Sub(x, y *FieldElement) *FieldElement {
 	return z
 }
 
-func (fe *FieldElement) Mul(other *FieldElement) *FieldElement {
+// Now implements interface similar in style to big.Int
+func (z *FieldElement) Mul(x, y *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 6
-	if fe == nil || other == nil {
+	if z == nil {
+		panic("Cannot write to nil pointer")
+	}
+	if x == nil || y == nil {
 		panic("Cannot multiply nil pointers")
 	}
 	//if fe.prime != other.prime {
-	if fe.prime.Cmp(&other.prime) != 0 {
+	if x.prime.Cmp(&y.prime) != 0 {
 		panic("Cannot multiply two numbers in different Fields")
 	}
-	//num := Mod((fe.num * other.num), fe.prime)
-	var num big.Int
-	num.Mul(&fe.num, &other.num)
-	num.Mod(&num, &fe.prime)
-	return NewFieldElementBig(&num, &fe.prime)
+	//num := x.num * y.num % x.prime
+	var prod big.Int
+	prod.Mul(&x.num, &y.num)
+	z.num.Mod(&prod, &x.prime)
+	z.prime.Set(&x.prime)
+	return z
 }
 
 func (fe *FieldElement) Pow(exp *big.Int) *FieldElement {
@@ -243,9 +248,10 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	//if y^2 != x^3 + ax + b
 	lhs := y.Pow(big.NewInt(2))
 	xcubed := x.Pow(big.NewInt(3))
-	ax := a.Mul(x)
+	var ax FieldElement
+	ax.Mul(a, x)
 	var xCubedPlusAx FieldElement
-	xCubedPlusAx.Add(xcubed, ax)
+	xCubedPlusAx.Add(xcubed, &ax)
 	var rhs FieldElement
 	rhs.Add(&xCubedPlusAx, b)
 	if !lhs.Eq(&rhs) {
@@ -380,9 +386,10 @@ func (p *Point) Add(other *Point) *Point {
 
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
-		sTimesX1MinusX3 := s.Mul(&x1MinusX3)
+		var sTimesX1MinusX3 FieldElement
+		sTimesX1MinusX3.Mul(s, &x1MinusX3)
 		var y3 FieldElement
-		y3.Sub(sTimesX1MinusX3, &p.y)
+		y3.Sub(&sTimesX1MinusX3, &p.y)
 
 		return NewPoint(&x3, &y3, &p.a, &p.b)
 	}
@@ -409,9 +416,10 @@ func (p *Point) Add(other *Point) *Point {
 
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
-		sTimesX1MinusX3 := s.Mul(&x1MinusX3)
+		var sTimesX1MinusX3 FieldElement
+		sTimesX1MinusX3.Mul(s, &x1MinusX3)
 		var y3 FieldElement
-		y3.Sub(sTimesX1MinusX3, &p.y)
+		y3.Sub(&sTimesX1MinusX3, &p.y)
 
 		return NewPoint(&x3, &y3, &p.a, &p.b)
 	}

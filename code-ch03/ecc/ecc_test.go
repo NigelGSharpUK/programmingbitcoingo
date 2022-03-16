@@ -52,7 +52,9 @@ func TestSub(t *testing.T) {
 func TestMul(t *testing.T) {
 	a := NewFieldElement(24, 31)
 	b := NewFieldElement(19, 31)
-	if !a.Mul(b).Eq(NewFieldElement(22, 31)) {
+	var c FieldElement
+	c.Mul(a, b)
+	if !c.Eq(NewFieldElement(22, 31)) {
 		t.Fail()
 	}
 }
@@ -64,7 +66,10 @@ func TestPow(t *testing.T) {
 	}
 	a = NewFieldElement(5, 31)
 	b := NewFieldElement(18, 31)
-	if !a.Pow(big.NewInt(5)).Mul(b).Eq(NewFieldElement(16, 31)) {
+	a5 := a.Pow(big.NewInt(5))
+	var c FieldElement
+	c.Mul(a5, b)
+	if !c.Eq(NewFieldElement(16, 31)) {
 		t.Fail()
 	}
 }
@@ -81,7 +86,10 @@ func TestDiv(t *testing.T) {
 	}
 	a = NewFieldElement(4, 31)
 	b = NewFieldElement(11, 31)
-	if !a.Pow(big.NewInt(-4)).Mul(b).Eq(NewFieldElement(13, 31)) {
+	a4 := a.Pow(big.NewInt(-4))
+	var c FieldElement
+	c.Mul(a4, b)
+	if !c.Eq(NewFieldElement(13, 31)) {
 		t.Fail()
 	}
 }
