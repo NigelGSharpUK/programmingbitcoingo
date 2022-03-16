@@ -192,28 +192,32 @@ func (z *FieldElement) Exp(x *FieldElement, y *big.Int) *FieldElement {
 	return z
 }
 
-func (fe *FieldElement) Div(other *FieldElement) *FieldElement {
+// Now implements interface similar in style to big.Int
+func (z *FieldElement) Div(x, y *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
-	if fe == nil || other == nil {
+	if z == nil {
+		panic("Cannot write to nil pointer")
+	}
+	if x == nil || y == nil {
 		panic("Cannot divide nil pointers")
 	}
-	//if fe.prime != other.prime {
-	if fe.prime.Cmp(&other.prime) != 0 {
+	//if x.prime != y.prime {
+	if x.prime.Cmp(&y.prime) != 0 {
 		panic("Cannot divide two numbers in different Fields")
 	}
 	// Using Fermat's Little Theorem
-	//num := Mod(fe.num*PowMod(other.num, fe.prime-2, fe.prime), fe.prime)
+	//num := (x.num * Pow(y.num, x.prime-2, x.prime) % x.prime
 	var pMinusTwo big.Int
-	pMinusTwo.Sub(&fe.prime, big.NewInt(2))
+	pMinusTwo.Sub(&x.prime, big.NewInt(2))
 	var numToPMinusTwo big.Int
-	numToPMinusTwo.Exp(&other.num, &pMinusTwo, &fe.prime)
+	numToPMinusTwo.Exp(&y.num, &pMinusTwo, &x.prime)
 	var product big.Int
-	product.Mul(&fe.num, &numToPMinusTwo)
-	var num big.Int
-	num.Mod(&product, &fe.prime)
-	return NewFieldElementBig(&num, &fe.prime)
+	product.Mul(&x.num, &numToPMinusTwo)
+	z.num.Mod(&product, &x.prime)
+	z.prime.Set(&x.prime)
+	return z
 }
 
 func (fe *FieldElement) Rmul(coefficient *big.Int) *FieldElement {
@@ -379,10 +383,11 @@ func (p *Point) Add(other *Point) *Point {
 		ydiff.Sub(&other.y, &p.y)
 		var xdiff FieldElement
 		xdiff.Sub(&other.x, &p.x)
-		s := ydiff.Div(&xdiff)
+		var s FieldElement
+		s.Div(&ydiff, &xdiff)
 
 		var ssquared FieldElement
-		ssquared.Exp(s, big.NewInt(2))
+		ssquared.Exp(&s, big.NewInt(2))
 		var ssquaredMinusX1 FieldElement
 		ssquaredMinusX1.Sub(&ssquared, &p.x)
 		var x3 FieldElement
@@ -391,7 +396,7 @@ func (p *Point) Add(other *Point) *Point {
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
 		var sTimesX1MinusX3 FieldElement
-		sTimesX1MinusX3.Mul(s, &x1MinusX3)
+		sTimesX1MinusX3.Mul(&s, &x1MinusX3)
 		var y3 FieldElement
 		y3.Sub(&sTimesX1MinusX3, &p.y)
 
@@ -413,10 +418,11 @@ func (p *Point) Add(other *Point) *Point {
 		x1squaredTimesThree := x1squared.Rmul(big.NewInt(3))
 		var x1squaredTimesThreePlusA FieldElement
 		x1squaredTimesThreePlusA.Add(x1squaredTimesThree, &p.a)
-		s := x1squaredTimesThreePlusA.Div(p.y.Rmul(big.NewInt(2)))
+		var s FieldElement
+		s.Div(&x1squaredTimesThreePlusA, p.y.Rmul(big.NewInt(2)))
 
 		var ssquared FieldElement
-		ssquared.Exp(s, big.NewInt(2))
+		ssquared.Exp(&s, big.NewInt(2))
 		twox1 := p.x.Rmul(big.NewInt(2))
 		var x3 FieldElement
 		x3.Sub(&ssquared, twox1)
@@ -424,7 +430,7 @@ func (p *Point) Add(other *Point) *Point {
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
 		var sTimesX1MinusX3 FieldElement
-		sTimesX1MinusX3.Mul(s, &x1MinusX3)
+		sTimesX1MinusX3.Mul(&s, &x1MinusX3)
 		var y3 FieldElement
 		y3.Sub(&sTimesX1MinusX3, &p.y)
 

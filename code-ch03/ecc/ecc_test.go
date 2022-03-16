@@ -80,7 +80,9 @@ func TestPow(t *testing.T) {
 func TestDiv(t *testing.T) {
 	a := NewFieldElement(3, 31)
 	b := NewFieldElement(24, 31)
-	if !a.Div(b).Eq(NewFieldElement(4, 31)) {
+	var c FieldElement
+	c.Div(a, b)
+	if !c.Eq(NewFieldElement(4, 31)) {
 		t.Fail()
 	}
 	a = NewFieldElement(17, 31)
@@ -93,7 +95,6 @@ func TestDiv(t *testing.T) {
 	b = NewFieldElement(11, 31)
 	var a4 FieldElement
 	a4.Exp(a, big.NewInt(-4))
-	var c FieldElement
 	c.Mul(&a4, b)
 	if !c.Eq(NewFieldElement(13, 31)) {
 		t.Fail()
