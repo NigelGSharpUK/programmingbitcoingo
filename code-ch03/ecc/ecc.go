@@ -220,19 +220,19 @@ func (z *FieldElement) Div(x, y *FieldElement) *FieldElement {
 	return z
 }
 
-func (fe *FieldElement) Rmul(coefficient *big.Int) *FieldElement {
-	//num := Mod(fe.num*coefficient, fe.prime)
+func (z *FieldElement) Rmul(x *FieldElement, y *big.Int) *FieldElement {
+	//num := x.num * y % x.prime
 	var product big.Int
-	product.Mul(&fe.num, coefficient)
-	var num big.Int
-	num.Mod(&product, &fe.prime)
-	return NewFieldElementBig(&num, &fe.prime)
+	product.Mul(&x.num, y)
+	z.num.Mod(&product, &x.prime)
+	z.prime.Set(&x.prime)
+	return z
 }
 
-func (fe *FieldElement) Set(other *FieldElement) *FieldElement {
-	fe.num = other.num
-	fe.prime = other.prime
-	return fe
+func (z *FieldElement) Set(x *FieldElement) *FieldElement {
+	z.num = x.num
+	z.prime = x.prime
+	return z
 }
 
 type Point struct {
@@ -415,17 +415,21 @@ func (p *Point) Add(other *Point) *Point {
 	if p.x.Eq(&other.x) && p.y.Eq(&other.y) {
 		var x1squared FieldElement
 		x1squared.Exp(&p.x, big.NewInt(2))
-		x1squaredTimesThree := x1squared.Rmul(big.NewInt(3))
+		var x1squaredTimesThree FieldElement
+		x1squaredTimesThree.Rmul(&x1squared, big.NewInt(3))
 		var x1squaredTimesThreePlusA FieldElement
-		x1squaredTimesThreePlusA.Add(x1squaredTimesThree, &p.a)
+		x1squaredTimesThreePlusA.Add(&x1squaredTimesThree, &p.a)
+		var twoy1 FieldElement
+		twoy1.Rmul(&p.y, big.NewInt(2))
 		var s FieldElement
-		s.Div(&x1squaredTimesThreePlusA, p.y.Rmul(big.NewInt(2)))
+		s.Div(&x1squaredTimesThreePlusA, &twoy1)
 
 		var ssquared FieldElement
 		ssquared.Exp(&s, big.NewInt(2))
-		twox1 := p.x.Rmul(big.NewInt(2))
+		var twox1 FieldElement
+		twox1.Rmul(&p.x, big.NewInt(2))
 		var x3 FieldElement
-		x3.Sub(&ssquared, twox1)
+		x3.Sub(&ssquared, &twox1)
 
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
