@@ -116,17 +116,6 @@ func (fe *FieldElement) Eq(other *FieldElement) bool {
 	return fe.num.Cmp(&other.num) == 0 && fe.prime.Cmp(&other.prime) == 0
 }
 
-// Test for inequality
-func (fe *FieldElement) Ne(other *FieldElement) bool {
-	//panic("Not Implemented")
-
-	// Answer Exercise 1
-	if fe == nil || other == nil {
-		panic("Cannot compare nil pointers")
-	}
-	return !fe.Eq(other)
-}
-
 func (fe *FieldElement) Add(other *FieldElement) *FieldElement {
 	if fe == nil || other == nil {
 		panic("Cannot add nil pointers")
@@ -244,7 +233,7 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	res.a.Set(a)
 	res.b.Set(b)
 	//if y.Pow(2).Ne(x.Pow(3).Add(a.Mul(x)).Add(b)) {
-	if y.Pow(big.NewInt(2)).Ne(x.Pow(big.NewInt(3)).Add(a.Mul(x)).Add(b)) {
+	if !y.Pow(big.NewInt(2)).Eq(x.Pow(big.NewInt(3)).Add(a.Mul(x)).Add(b)) {
 		panic("Point is not on the curve")
 	}
 	return res
@@ -279,13 +268,6 @@ func (p *Point) Eq(other *Point) bool {
 	}
 	// Now we're safe to compare FiniteFields
 	return p.x.Eq(&other.x) && p.y.Eq(&other.y) && p.a.Eq(&other.a) && p.b.Eq(&other.b)
-}
-
-func (p *Point) Ne(other *Point) bool {
-	//panic("Not Implemented")
-
-	// Exercise 2 answer
-	return !p.Eq(other)
 }
 
 func (p *Point) Repr() string {
@@ -330,7 +312,7 @@ func (p *Point) Rmul(coefficient *big.Int) *Point {
 }
 
 func (p *Point) Add(other *Point) *Point {
-	if p.a.Ne(&other.a) || p.b.Ne(&other.b) {
+	if !p.a.Eq(&other.a) || !p.b.Eq(&other.b) {
 		panic("Can't add points that are not on same curve")
 	}
 	var result Point
@@ -356,7 +338,7 @@ func (p *Point) Add(other *Point) *Point {
 	// panic("Not implemented")
 
 	// Answer Exercise 3
-	if p.x.Eq(&other.x) && p.y.Ne(&other.y) {
+	if p.x.Eq(&other.x) && !p.y.Eq(&other.y) {
 		return NewInfPoint(&p.a, &p.b)
 	}
 
@@ -365,7 +347,7 @@ func (p *Point) Add(other *Point) *Point {
 	// s=(y2-y1)/(x2-x1)
 	// x3=s**2-x1-x2
 	// y3=s*(x1-x3)-y1
-	if p.x.Ne(&other.x) {
+	if !p.x.Eq(&other.x) {
 		// panic( "Not implemented")
 
 		// Answer Exercise 5
