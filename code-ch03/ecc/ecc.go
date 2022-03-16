@@ -22,14 +22,23 @@ func secp256k1_Params() *CurveParams {
 	params.a.SetInt64(0)
 	params.b.SetInt64(7)
 
+	var _2 big.Int
+	_2.SetInt64(2)
+	var _256 big.Int
+	_256.SetInt64(256)
+	var _32 big.Int
+	_32.SetInt64(32)
+	var _977 big.Int
+	_977.SetInt64(977)
+
 	// p = 2^256 - 2^32 - 977
 	var p2_256 big.Int
-	p2_256.Exp(big.NewInt(2), big.NewInt(256), nil)
+	p2_256.Exp(&_2, &_256, nil)
 	var p2_32 big.Int
-	p2_32.Exp(big.NewInt(2), big.NewInt(32), nil)
+	p2_32.Exp(&_2, &_32, nil)
 	var diffPowers2 big.Int
 	diffPowers2.Sub(&p2_256, &p2_32)
-	params.p.Sub(&diffPowers2, big.NewInt(977))
+	params.p.Sub(&diffPowers2, &_977)
 
 	// Gx = a big hex number
 	params.Gx.SetString("79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798", 16)
@@ -52,7 +61,10 @@ func NewFieldElement(num int64, prime int64) *FieldElement {
 }
 
 func NewFieldElementBig(num *big.Int, prime *big.Int) *FieldElement {
-	if num.Cmp(prime) >= 0 || num.Cmp(big.NewInt(0)) == -1 {
+	var _0 big.Int
+	_0.SetInt64(0)
+
+	if num.Cmp(prime) >= 0 || num.Cmp(&_0) == -1 {
 		panic("num must be between 0 and prime-1 inclusive")
 	}
 	fe := new(FieldElement)
@@ -92,6 +104,9 @@ func G() *Point {
 }
 
 func (fe *FieldElement) Repr() string {
+	var _9999 big.Int
+	_9999.SetInt64(9999)
+
 	primeOrder := ""
 	if fe.prime.Cmp(&secp256k1_Params().p) == 0 {
 		primeOrder = "secp256k1"
@@ -99,7 +114,7 @@ func (fe *FieldElement) Repr() string {
 		primeOrder = fmt.Sprintf("%d", &fe.prime)
 	}
 	val := ""
-	if fe.num.Cmp(big.NewInt(65536)) == -1 {
+	if fe.num.Cmp(&_9999) == -1 {
 		val = fmt.Sprintf("%d", &fe.num) // Small numbers as decimal
 	} else {
 		val = fmt.Sprintf("%064X", &fe.num) // Big numbers as 256 bit hex
@@ -181,9 +196,12 @@ func (z *FieldElement) Mul(x, y *FieldElement) *FieldElement {
 
 // Now implements interface similar in style to big.Int
 func (z *FieldElement) Exp(x *FieldElement, y *big.Int) *FieldElement {
+	var _1 big.Int
+	_1.SetInt64(1)
+
 	//n := exp % (x.prime - 1))
 	var primeMinusOne big.Int
-	primeMinusOne.Sub(&x.prime, big.NewInt(1))
+	primeMinusOne.Sub(&x.prime, &_1)
 	var n big.Int
 	n.Mod(y, &primeMinusOne)
 	//num := Pow(x.num, n, x.prime)
@@ -197,6 +215,9 @@ func (z *FieldElement) Div(x, y *FieldElement) *FieldElement {
 	//panic("Not Implemented")
 
 	// Answer Exercise 9
+	var _2 big.Int
+	_2.SetInt64(2)
+
 	if z == nil {
 		panic("Cannot write to nil pointer")
 	}
@@ -210,7 +231,7 @@ func (z *FieldElement) Div(x, y *FieldElement) *FieldElement {
 	// Using Fermat's Little Theorem
 	//num := (x.num * Pow(y.num, x.prime-2, x.prime) % x.prime
 	var pMinusTwo big.Int
-	pMinusTwo.Sub(&x.prime, big.NewInt(2))
+	pMinusTwo.Sub(&x.prime, &_2)
 	var numToPMinusTwo big.Int
 	numToPMinusTwo.Exp(&y.num, &pMinusTwo, &x.prime)
 	var product big.Int
@@ -244,6 +265,11 @@ type Point struct {
 }
 
 func NewPoint(x, y, a, b *FieldElement) *Point {
+	var _2 big.Int
+	_2.SetInt64(2)
+	var _3 big.Int
+	_3.SetInt64(3)
+
 	res := new(Point)
 	res.isInf = false
 	res.x.Set(x)
@@ -252,9 +278,9 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	res.b.Set(b)
 	//if y^2 != x^3 + ax + b
 	var lhs FieldElement
-	lhs.Exp(y, big.NewInt(2))
+	lhs.Exp(y, &_2)
 	var xcubed FieldElement
-	xcubed.Exp(x, big.NewInt(3))
+	xcubed.Exp(x, &_3)
 	var ax FieldElement
 	ax.Mul(a, x)
 	var xCubedPlusAx FieldElement
@@ -323,13 +349,18 @@ func (p *Point) Rmul(coefficient *big.Int) *Point {
 	var current Point
 	current.Set(p)
 
+	var _0 big.Int
+	_0.SetInt64(0)
+	var _1 big.Int
+	_1.SetInt64(1)
+
 	result := NewInfPoint(&p.a, &p.b) // Point at infinity acts as zero
 	//for coef != 0 {
-	for coef.Cmp(big.NewInt(0)) != 0 {
+	for coef.Cmp(&_0) != 0 {
 		//if coef&1 == 1 {
 		var lsb big.Int
-		lsb.And(&coef, big.NewInt(1))
-		if lsb.Cmp(big.NewInt(1)) == 0 {
+		lsb.And(&coef, &_1)
+		if lsb.Cmp(&_1) == 0 {
 			result = result.Add(&current)
 		}
 		current.Set(current.Add(&current))
@@ -355,9 +386,12 @@ func (p *Point) Add(other *Point) *Point {
 		return &result
 	}
 
+	var _0 big.Int
+	_0.SetInt64(0)
+
 	// Handle p==other and y==0 (vertical tangent)
 	//if p.Eq(other) && p.y.num == 0 {
-	if p.Eq(other) && p.y.num.Cmp(big.NewInt(0)) == 0 { // [  ] Is this the zero that is meant?
+	if p.Eq(other) && p.y.num.Cmp(&_0) == 0 { // [  ] Is this the zero that is meant?
 		return NewInfPoint(&p.a, &p.b)
 	}
 
@@ -369,6 +403,9 @@ func (p *Point) Add(other *Point) *Point {
 	if p.x.Eq(&other.x) && !p.y.Eq(&other.y) {
 		return NewInfPoint(&p.a, &p.b)
 	}
+
+	var _2 big.Int
+	_2.SetInt64(2)
 
 	// Case 2: self.x ≠ other.x
 	// Formula (x3,y3)==(x1,y1)+(x2,y2)
@@ -387,7 +424,7 @@ func (p *Point) Add(other *Point) *Point {
 		s.Div(&ydiff, &xdiff)
 
 		var ssquared FieldElement
-		ssquared.Exp(&s, big.NewInt(2))
+		ssquared.Exp(&s, &_2)
 		var ssquaredMinusX1 FieldElement
 		ssquaredMinusX1.Sub(&ssquared, &p.x)
 		var x3 FieldElement
@@ -403,6 +440,9 @@ func (p *Point) Add(other *Point) *Point {
 		return NewPoint(&x3, &y3, &p.a, &p.b)
 	}
 
+	var _3 big.Int
+	_3.SetInt64(3)
+
 	// Case 3: self == other
 	// Formula (x3,y3)=(x1,y1)+(x1,y1)
 	// s=(3*x1**2+a)/(2*y1)
@@ -414,20 +454,20 @@ func (p *Point) Add(other *Point) *Point {
 	// Handle p,other being same point, so use tangent
 	if p.x.Eq(&other.x) && p.y.Eq(&other.y) {
 		var x1squared FieldElement
-		x1squared.Exp(&p.x, big.NewInt(2))
+		x1squared.Exp(&p.x, &_2)
 		var x1squaredTimesThree FieldElement
-		x1squaredTimesThree.Rmul(&x1squared, big.NewInt(3))
+		x1squaredTimesThree.Rmul(&x1squared, &_3)
 		var x1squaredTimesThreePlusA FieldElement
 		x1squaredTimesThreePlusA.Add(&x1squaredTimesThree, &p.a)
 		var twoy1 FieldElement
-		twoy1.Rmul(&p.y, big.NewInt(2))
+		twoy1.Rmul(&p.y, &_2)
 		var s FieldElement
 		s.Div(&x1squaredTimesThreePlusA, &twoy1)
 
 		var ssquared FieldElement
-		ssquared.Exp(&s, big.NewInt(2))
+		ssquared.Exp(&s, &_2)
 		var twox1 FieldElement
-		twox1.Rmul(&p.x, big.NewInt(2))
+		twox1.Rmul(&p.x, &_2)
 		var x3 FieldElement
 		x3.Sub(&ssquared, &twox1)
 
@@ -442,7 +482,7 @@ func (p *Point) Add(other *Point) *Point {
 	}
 
 	// Final case, tangent is vertical
-	if p.x.Eq(&other.x) && p.y.num.Cmp(big.NewInt(0)) == 0 { // [  ] Is this what's really meant by "y is zero"
+	if p.x.Eq(&other.x) && p.y.num.Cmp(&_0) == 0 { // [  ] Is this what's really meant by "y is zero"
 		return NewInfPoint(&p.a, &p.b)
 	}
 
