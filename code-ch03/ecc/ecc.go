@@ -62,6 +62,26 @@ func NewFieldElement_(num int, prime int) *FieldElement {
 	return NewFieldElement(bigNum, bigPrime)
 }
 
+func NewS256Field(num *big.Int) *FieldElement {
+	return NewFieldElement(num, secp256k1_Params().p)
+}
+
+func NewS256Point(x *big.Int, y *big.Int) *Point {
+	a := big.NewInt(secp256k1_Params().a.Int64())
+	b := big.NewInt(secp256k1_Params().b.Int64())
+	return NewPoint(NewS256Field(x), NewS256Field(y), NewS256Field(a), NewS256Field(b))
+}
+
+func NewS256InfPoint() *Point {
+	a := big.NewInt(secp256k1_Params().a.Int64())
+	b := big.NewInt(secp256k1_Params().b.Int64())
+	return NewInfPoint(NewS256Field(a), NewS256Field(b))
+}
+
+func G() *Point {
+	return NewS256Point(secp256k1_Params().Gx, secp256k1_Params().Gy)
+}
+
 func (fe *FieldElement) Repr() string {
 	primeOrder := ""
 	if fe.prime.Cmp(secp256k1_Params().p) == 0 {
@@ -254,7 +274,17 @@ func (p *Point) Repr() string {
 }
 
 func (p *Point) Rmul(coefficient *big.Int) *Point {
-	coef := coefficient // [  ] OK? Or are we just copying pointers?!
+	// If order of FieldElement is Bitcoin's p, then we can assume a value for n,
+	// which we can use to increase efficiency by modding by n
+	// HACK - assumes we never want to use the same p as Bitcoin's p other than when dealing with Bitcoin
+	coef := big.NewInt(0)
+	order := p.x.prime
+	if order.Cmp(secp256k1_Params().p) == 0 {
+		coef.Mod(coefficient, secp256k1_Params().n)
+	} else {
+		coef.Set(coefficient)
+	}
+
 	current := p
 	result := NewInfPoint(p.a, p.b) // Point at infinity acts as zero
 	//for coef != 0 {
