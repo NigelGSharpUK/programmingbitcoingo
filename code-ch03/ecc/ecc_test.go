@@ -6,9 +6,9 @@ import (
 )
 
 func TestNe(t *testing.T) {
-	a := NewFieldElement_(2, 31)
-	b := NewFieldElement_(2, 31)
-	c := NewFieldElement_(15, 31)
+	a := NewFieldElement(2, 31)
+	b := NewFieldElement(2, 31)
+	c := NewFieldElement(15, 31)
 	if !a.Eq(b) {
 		t.Fail()
 	}
@@ -21,64 +21,64 @@ func TestNe(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	a := NewFieldElement_(2, 31)
-	b := NewFieldElement_(15, 31)
-	if a.Add(b).Ne(NewFieldElement_(17, 31)) {
+	a := NewFieldElement(2, 31)
+	b := NewFieldElement(15, 31)
+	if a.Add(b).Ne(NewFieldElement(17, 31)) {
 		t.Fail()
 	}
-	a = NewFieldElement_(17, 31)
-	b = NewFieldElement_(21, 31)
-	if a.Add(b).Ne(NewFieldElement_(7, 31)) {
+	a = NewFieldElement(17, 31)
+	b = NewFieldElement(21, 31)
+	if a.Add(b).Ne(NewFieldElement(7, 31)) {
 		t.Fail()
 	}
 }
 
 func TestSub(t *testing.T) {
-	a := NewFieldElement_(29, 31)
-	b := NewFieldElement_(4, 31)
-	if a.Sub(b).Ne(NewFieldElement_(25, 31)) {
+	a := NewFieldElement(29, 31)
+	b := NewFieldElement(4, 31)
+	if a.Sub(b).Ne(NewFieldElement(25, 31)) {
 		t.Fail()
 	}
-	a = NewFieldElement_(15, 31)
-	b = NewFieldElement_(30, 31)
-	if a.Sub(b).Ne(NewFieldElement_(16, 31)) {
+	a = NewFieldElement(15, 31)
+	b = NewFieldElement(30, 31)
+	if a.Sub(b).Ne(NewFieldElement(16, 31)) {
 		t.Fail()
 	}
 }
 
 func TestMul(t *testing.T) {
-	a := NewFieldElement_(24, 31)
-	b := NewFieldElement_(19, 31)
-	if a.Mul(b).Ne(NewFieldElement_(22, 31)) {
+	a := NewFieldElement(24, 31)
+	b := NewFieldElement(19, 31)
+	if a.Mul(b).Ne(NewFieldElement(22, 31)) {
 		t.Fail()
 	}
 }
 
 func TestPow(t *testing.T) {
-	a := NewFieldElement_(17, 31)
-	if a.Pow(big.NewInt(3)).Ne(NewFieldElement_(15, 31)) {
+	a := NewFieldElement(17, 31)
+	if a.Pow(big.NewInt(3)).Ne(NewFieldElement(15, 31)) {
 		t.Fail()
 	}
-	a = NewFieldElement_(5, 31)
-	b := NewFieldElement_(18, 31)
-	if a.Pow(big.NewInt(5)).Mul(b).Ne(NewFieldElement_(16, 31)) {
+	a = NewFieldElement(5, 31)
+	b := NewFieldElement(18, 31)
+	if a.Pow(big.NewInt(5)).Mul(b).Ne(NewFieldElement(16, 31)) {
 		t.Fail()
 	}
 }
 
 func TestDiv(t *testing.T) {
-	a := NewFieldElement_(3, 31)
-	b := NewFieldElement_(24, 31)
-	if a.Div(b).Ne(NewFieldElement_(4, 31)) {
+	a := NewFieldElement(3, 31)
+	b := NewFieldElement(24, 31)
+	if a.Div(b).Ne(NewFieldElement(4, 31)) {
 		t.Fail()
 	}
-	a = NewFieldElement_(17, 31)
-	if a.Pow(big.NewInt(-3)).Ne(NewFieldElement_(29, 31)) {
+	a = NewFieldElement(17, 31)
+	if a.Pow(big.NewInt(-3)).Ne(NewFieldElement(29, 31)) {
 		t.Fail()
 	}
-	a = NewFieldElement_(4, 31)
-	b = NewFieldElement_(11, 31)
-	if a.Pow(big.NewInt(-4)).Mul(b).Ne(NewFieldElement_(13, 31)) {
+	a = NewFieldElement(4, 31)
+	b = NewFieldElement(11, 31)
+	if a.Pow(big.NewInt(-4)).Mul(b).Ne(NewFieldElement(13, 31)) {
 		t.Fail()
 	}
 }
@@ -128,15 +128,15 @@ func TestPointAdd2(t *testing.T) {
 */
 
 func TestEccTestOnCurve(t *testing.T) {
-	prime := 223
-	a := NewFieldElement_(0, prime)
-	b := NewFieldElement_(7, prime)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
 	//https://golang.org/ref/spec#Composite_literals
-	valid_points := [][]int{{192, 105}, {17, 56}, {1, 193}}
+	valid_points := [][]int64{{192, 105}, {17, 56}, {1, 193}}
 	//invalid_points := [][]int{{200, 119}, {42, 99}}
 	for _, point := range valid_points {
-		x := NewFieldElement_(point[0], prime)
-		y := NewFieldElement_(point[1], prime)
+		x := NewFieldElement(point[0], prime)
+		y := NewFieldElement(point[1], prime)
 		p := NewPoint(x, y, a, b)
 		println(p.Repr())
 	}
@@ -144,24 +144,24 @@ func TestEccTestOnCurve(t *testing.T) {
 
 // Answer Exercise 3
 func TestEccAdd(t *testing.T) {
-	prime := 223
-	a := NewFieldElement_(0, prime)
-	b := NewFieldElement_(7, prime)
-	p1 := NewPoint(NewFieldElement_(170, prime), NewFieldElement_(142, prime), a, b)
-	p2 := NewPoint(NewFieldElement_(60, prime), NewFieldElement_(139, prime), a, b)
-	sum := NewPoint(NewFieldElement_(220, prime), NewFieldElement_(181, prime), a, b)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	p1 := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
+	p2 := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
+	sum := NewPoint(NewFieldElement(220, prime), NewFieldElement(181, prime), a, b)
 	if p1.Add(p2).Ne(sum) {
 		t.Fail()
 	}
-	p1 = NewPoint(NewFieldElement_(47, prime), NewFieldElement_(71, prime), a, b)
-	p2 = NewPoint(NewFieldElement_(17, prime), NewFieldElement_(56, prime), a, b)
-	sum = NewPoint(NewFieldElement_(215, prime), NewFieldElement_(68, prime), a, b)
+	p1 = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	p2 = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
+	sum = NewPoint(NewFieldElement(215, prime), NewFieldElement(68, prime), a, b)
 	if p1.Add(p2).Ne(sum) {
 		t.Fail()
 	}
-	p1 = NewPoint(NewFieldElement_(143, prime), NewFieldElement_(98, prime), a, b)
-	p2 = NewPoint(NewFieldElement_(76, prime), NewFieldElement_(66, prime), a, b)
-	sum = NewPoint(NewFieldElement_(47, prime), NewFieldElement_(71, prime), a, b)
+	p1 = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
+	p2 = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
+	sum = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
 	if p1.Add(p2).Ne(sum) {
 		t.Fail()
 	}
@@ -169,16 +169,16 @@ func TestEccAdd(t *testing.T) {
 
 // We must be able to compare with inf (we found that we couldn't at first!)
 func TestInfCompare(t *testing.T) {
-	prime := 223
-	a := NewFieldElement_(0, prime)
-	b := NewFieldElement_(7, prime)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
 	infx := NewInfPoint(a, b)
 	infy := NewInfPoint(a, b)
 	if infx.Ne(infy) {
 		t.Fail()
 	}
-	x := NewFieldElement_(15, prime)
-	y := NewFieldElement_(86, prime)
+	x := NewFieldElement(15, prime)
+	y := NewFieldElement(86, prime)
 	z := NewPoint(x, y, a, b)
 	if infx.Eq(z) {
 		t.Fail()
@@ -191,11 +191,11 @@ func TestInfCompare(t *testing.T) {
 func TestBitcoinParams(t *testing.T) {
 	// Verify Gx,Gy are on the curve y^2 = x^3 +ax +b (with a,b = 0,7)
 	bitcoinParams := secp256k1_Params()
-	Gx := bitcoinParams.Gx
-	Gy := bitcoinParams.Gy
-	a := bitcoinParams.a
-	b := bitcoinParams.b
-	p := bitcoinParams.p
+	Gx := &bitcoinParams.Gx
+	Gy := &bitcoinParams.Gy
+	a := &bitcoinParams.a
+	b := &bitcoinParams.b
+	p := &bitcoinParams.p
 	var ysquared big.Int
 	ysquared.Exp(Gy, big.NewInt(2), p)
 	var xcubed big.Int
@@ -216,9 +216,9 @@ func TestBitcoinParams(t *testing.T) {
 	}
 
 	// Verify the order of the group generated by point Gx,Gy is n
-	G := G()                  // Bitcoin's generator point
-	n := secp256k1_Params().n // Bitcoin's order of the group generated by G
-	inf := G.Rmul(n)          // Should be the zero point (at infinity)
+	G := G()              // Bitcoin's generator point
+	n := &bitcoinParams.n // Bitcoin's order of the group generated by G
+	inf := G.Rmul(n)      // Should be the zero point (at infinity)
 	if inf.Ne(NewS256InfPoint()) {
 		t.Fail()
 	}

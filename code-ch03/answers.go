@@ -20,49 +20,49 @@ func on_curve(x, y, a, b *FieldElement) bool {
 
 func exercise1() {
 	println("Exercise 1")
-	prime := big.NewInt(223)
-	a := NewFieldElement(big.NewInt(0), prime)
-	b := NewFieldElement(big.NewInt(7), prime)
-	println(on_curve(NewFieldElement(big.NewInt(192), prime), NewFieldElement(big.NewInt(105), prime), a, b))
-	println(on_curve(NewFieldElement(big.NewInt(17), prime), NewFieldElement(big.NewInt(56), prime), a, b))
-	println(on_curve(NewFieldElement(big.NewInt(200), prime), NewFieldElement(big.NewInt(119), prime), a, b))
-	println(on_curve(NewFieldElement(big.NewInt(1), prime), NewFieldElement(big.NewInt(193), prime), a, b))
-	println(on_curve(NewFieldElement(big.NewInt(42), prime), NewFieldElement(big.NewInt(99), prime), a, b))
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	println(on_curve(NewFieldElement(192, prime), NewFieldElement(105, prime), a, b))
+	println(on_curve(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b))
+	println(on_curve(NewFieldElement(200, prime), NewFieldElement(119, prime), a, b))
+	println(on_curve(NewFieldElement(1, prime), NewFieldElement(193, prime), a, b))
+	println(on_curve(NewFieldElement(42, prime), NewFieldElement(99, prime), a, b))
 }
 
 func exercise2() {
 	println("Exercise 2")
-	prime := big.NewInt(223)
-	a := NewFieldElement(big.NewInt(0), prime)
-	b := NewFieldElement(big.NewInt(7), prime)
-	x := NewPoint(NewFieldElement(big.NewInt(170), prime), NewFieldElement(big.NewInt(142), prime), a, b)
-	y := NewPoint(NewFieldElement(big.NewInt(60), prime), NewFieldElement(big.NewInt(139), prime), a, b)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	x := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
+	y := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
 	println(x.Add(y).Repr())
-	x = NewPoint(NewFieldElement(big.NewInt(47), prime), NewFieldElement(big.NewInt(71), prime), a, b)
-	y = NewPoint(NewFieldElement(big.NewInt(17), prime), NewFieldElement(big.NewInt(56), prime), a, b)
+	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	y = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
 	println(x.Add(y).Repr())
-	x = NewPoint(NewFieldElement(big.NewInt(143), prime), NewFieldElement(big.NewInt(98), prime), a, b)
-	y = NewPoint(NewFieldElement(big.NewInt(76), prime), NewFieldElement(big.NewInt(66), prime), a, b)
+	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
+	y = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
 	println(x.Add(y).Repr())
 }
 
 func exercise4() {
 	println("Exercise 4")
-	prime := big.NewInt(223)
-	a := NewFieldElement(big.NewInt(0), prime)
-	b := NewFieldElement(big.NewInt(7), prime)
-	x := NewPoint(NewFieldElement(big.NewInt(192), prime), NewFieldElement(big.NewInt(105), prime), a, b)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	x := NewPoint(NewFieldElement(192, prime), NewFieldElement(105, prime), a, b)
 	println(x.Add(x).Repr())
-	x = NewPoint(NewFieldElement(big.NewInt(143), prime), NewFieldElement(big.NewInt(98), prime), a, b)
+	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
 	println(x.Add(x).Repr())
-	x = NewPoint(NewFieldElement(big.NewInt(47), prime), NewFieldElement(big.NewInt(71), prime), a, b)
+	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
 	x = x.Add(x)
 	println(x.Repr()) // *2
 	x = x.Add(x)
 	println(x.Repr()) // *4
 	x = x.Add(x)
 	println(x.Repr()) // *8
-	origx := NewPoint(NewFieldElement(big.NewInt(47), prime), NewFieldElement(big.NewInt(71), prime), a, b)
+	origx := NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
 	x = NewInfPoint(a, b)
 	for i := 0; i < 21; i++ {
 		x = x.Add(origx)
@@ -72,10 +72,10 @@ func exercise4() {
 
 func exercise5() {
 	println("Exercise 5")
-	prime := big.NewInt(223)
-	a := NewFieldElement(big.NewInt(0), prime)
-	b := NewFieldElement(big.NewInt(7), prime)
-	origx := NewPoint(NewFieldElement(big.NewInt(15), prime), NewFieldElement(big.NewInt(86), prime), a, b)
+	prime := int64(223)
+	a := NewFieldElement(0, prime)
+	b := NewFieldElement(7, prime)
+	origx := NewPoint(NewFieldElement(15, prime), NewFieldElement(86, prime), a, b)
 	inf := NewInfPoint(a, b)
 	x := NewInfPoint(a, b)
 	var order int
