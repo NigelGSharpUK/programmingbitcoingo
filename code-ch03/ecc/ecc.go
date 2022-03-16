@@ -116,18 +116,22 @@ func (fe *FieldElement) Eq(other *FieldElement) bool {
 	return fe.num.Cmp(&other.num) == 0 && fe.prime.Cmp(&other.prime) == 0
 }
 
-func (fe *FieldElement) Add(other *FieldElement) *FieldElement {
-	if fe == nil || other == nil {
+// Now implements interface similar in style to big.Int
+func (z *FieldElement) Add(x, y *FieldElement) *FieldElement {
+	if z == nil {
+		panic("Cannot write to nil pointer")
+	}
+	if x == nil || y == nil {
 		panic("Cannot add nil pointers")
 	}
-	//if fe.prime != other.prime {
-	if fe.prime.Cmp(&other.prime) != 0 {
+	if x.prime.Cmp(&y.prime) != 0 {
 		panic("Cannot add two numbers in different Fields")
 	}
-	var num big.Int
-	num.Add(&fe.num, &other.num)
-	num.Mod(&num, &fe.prime) // [  ] I think this is OK - Euclidean Modulus unlike Go
-	return NewFieldElementBig(&num, &fe.prime)
+	var sum big.Int
+	sum.Add(&x.num, &y.num)
+	z.num.Mod(&sum, &x.prime) // [  ] I think this is OK - Euclidean Modulus unlike Go
+	z.prime.Set(&x.prime)
+	return z
 }
 
 func (fe *FieldElement) Sub(other *FieldElement) *FieldElement {
@@ -232,8 +236,15 @@ func NewPoint(x, y, a, b *FieldElement) *Point {
 	res.y.Set(y)
 	res.a.Set(a)
 	res.b.Set(b)
-	//if y.Pow(2).Ne(x.Pow(3).Add(a.Mul(x)).Add(b)) {
-	if !y.Pow(big.NewInt(2)).Eq(x.Pow(big.NewInt(3)).Add(a.Mul(x)).Add(b)) {
+	//if y^2 != x^3 + ax + b
+	lhs := y.Pow(big.NewInt(2))
+	xcubed := x.Pow(big.NewInt(3))
+	ax := a.Mul(x)
+	var xCubedPlusAx FieldElement
+	xCubedPlusAx.Add(xcubed, ax)
+	var rhs FieldElement
+	rhs.Add(&xCubedPlusAx, b)
+	if !lhs.Eq(&rhs) {
 		panic("Point is not on the curve")
 	}
 	return res
@@ -367,7 +378,10 @@ func (p *Point) Add(other *Point) *Point {
 	// Answer Exercise 7
 	// Handle p,other being same point, so use tangent
 	if p.x.Eq(&other.x) && p.y.Eq(&other.y) {
-		s := p.x.Pow(big.NewInt(2)).Rmul(big.NewInt(3)).Add(&p.a).Div(p.y.Rmul(big.NewInt(2)))
+		x1squaredTimesThree := p.x.Pow(big.NewInt(2)).Rmul(big.NewInt(3))
+		var x1squaredTimesThreePlusA FieldElement
+		x1squaredTimesThreePlusA.Add(x1squaredTimesThree, &p.a)
+		s := x1squaredTimesThreePlusA.Div(p.y.Rmul(big.NewInt(2)))
 		x3 := s.Pow(big.NewInt(2)).Sub(p.x.Rmul(big.NewInt(2)))
 		y3 := s.Mul(p.x.Sub(x3)).Sub(&p.y)
 		return NewPoint(x3, y3, &p.a, &p.b)

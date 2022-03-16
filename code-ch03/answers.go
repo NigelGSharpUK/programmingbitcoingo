@@ -14,8 +14,15 @@ func main() {
 }
 
 func on_curve(x, y, a, b *FieldElement) bool {
-	//return y.Pow(2).Eq(x.Pow(3).Add(a.Mul(x)).Add(b))
-	return y.Pow(big.NewInt(2)).Eq(x.Pow(big.NewInt(3)).Add(a.Mul(x)).Add(b))
+	//return y^2 == x^3 +ax +b
+	lhs := y.Pow(big.NewInt(2))
+	xcubed := x.Pow(big.NewInt(3))
+	ax := a.Mul(x)
+	var xcubedPlusAx FieldElement
+	xcubedPlusAx.Add(xcubed, ax)
+	var rhs FieldElement
+	rhs.Add(&xcubedPlusAx, b)
+	return lhs.Eq(&rhs)
 }
 
 func exercise1() {

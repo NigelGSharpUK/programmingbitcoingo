@@ -20,12 +20,15 @@ func TestEq(t *testing.T) {
 func TestAdd(t *testing.T) {
 	a := NewFieldElement(2, 31)
 	b := NewFieldElement(15, 31)
-	if !a.Add(b).Eq(NewFieldElement(17, 31)) {
+	var c FieldElement
+	c.Add(a, b)
+	if !c.Eq(NewFieldElement(17, 31)) {
 		t.Fail()
 	}
 	a = NewFieldElement(17, 31)
 	b = NewFieldElement(21, 31)
-	if !a.Add(b).Eq(NewFieldElement(7, 31)) {
+	c.Add(a, b)
+	if !c.Eq(NewFieldElement(7, 31)) {
 		t.Fail()
 	}
 }
