@@ -332,29 +332,29 @@ func (p *Point) Repr() string {
 	return "Point(" + p.x.Repr() + ",\n      " + p.y.Repr() + ")_" + p.a.Repr() + "_" + p.b.Repr()
 }
 
-func (p *Point) Rmul(coefficient *big.Int) *Point {
+func (z *Point) Rmul(x *Point, y *big.Int) *Point {
 	// If order of FieldElement is Bitcoin's p, then we can assume a value for n,
 	// which we can use to increase efficiency by modding by n
 	// HACK - assumes we never want to use the same p as Bitcoin's p other than when dealing with Bitcoin
 	params := secp256k1_Params()
 	var order big.Int
-	order.Set(&p.x.prime)
+	order.Set(&x.x.prime)
 	var coef big.Int
 	if order.Cmp(&params.p) == 0 {
-		coef.Mod(coefficient, &params.n)
+		coef.Mod(y, &params.n)
 	} else {
-		coef.Set(coefficient)
+		coef.Set(y)
 	}
 
 	var current Point
-	current.Set(p)
+	current.Set(x)
 
 	var _0 big.Int
 	_0.SetInt64(0)
 	var _1 big.Int
 	_1.SetInt64(1)
 
-	result := NewInfPoint(&p.a, &p.b) // Point at infinity acts as zero
+	result := NewInfPoint(&x.a, &x.b) // Point at infinity acts as zero
 	//for coef != 0 {
 	for coef.Cmp(&_0) != 0 {
 		//if coef&1 == 1 {
@@ -367,7 +367,8 @@ func (p *Point) Rmul(coefficient *big.Int) *Point {
 		//coef >>= 1
 		coef.Rsh(&coef, 1)
 	}
-	return result
+	z.Set(result)
+	return z
 }
 
 func (p *Point) Add(other *Point) *Point {
