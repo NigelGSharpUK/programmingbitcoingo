@@ -47,13 +47,17 @@ func exercise2() {
 	b := NewFieldElement(7, prime)
 	x := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
 	y := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
-	println(x.Add(y).Repr())
+	var sum Point
+	sum.Add(x, y)
+	println(sum.Repr())
 	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
 	y = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
-	println(x.Add(y).Repr())
+	sum.Add(x, y)
+	println(sum.Repr())
 	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
 	y = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
-	println(x.Add(y).Repr())
+	sum.Add(x, y)
+	println(sum.Repr())
 }
 
 func exercise4() {
@@ -62,22 +66,28 @@ func exercise4() {
 	a := NewFieldElement(0, prime)
 	b := NewFieldElement(7, prime)
 	x := NewPoint(NewFieldElement(192, prime), NewFieldElement(105, prime), a, b)
-	println(x.Add(x).Repr())
+	var sum Point
+	sum.Add(x, x)
+	println(sum.Repr())
 	x = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
-	println(x.Add(x).Repr())
+	sum.Add(x, x)
+	println(sum.Repr())
 	x = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
-	x = x.Add(x)
-	println(x.Repr()) // *2
-	x = x.Add(x)
-	println(x.Repr()) // *4
-	x = x.Add(x)
-	println(x.Repr()) // *8
+	sum.Add(x, x)
+	println(sum.Repr()) // * 2
+	x.Set(&sum)
+	sum.Add(x, x)
+	println(sum.Repr()) // * 4
+	x.Set(&sum)
+	sum.Add(x, x)
+	println(sum.Repr()) // * 8
 	origx := NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
-	x = NewInfPoint(a, b)
+	sum.Set(NewInfPoint(a, b))
 	for i := 0; i < 21; i++ {
-		x = x.Add(origx)
+		x.Set(&sum)
+		sum.Add(x, origx)
 	}
-	println(x.Repr()) // *21
+	println(sum.Repr()) // *21
 }
 
 func exercise5() {
@@ -87,10 +97,13 @@ func exercise5() {
 	b := NewFieldElement(7, prime)
 	origx := NewPoint(NewFieldElement(15, prime), NewFieldElement(86, prime), a, b)
 	inf := NewInfPoint(a, b)
-	x := NewInfPoint(a, b)
+	var x Point
+	x.Set(inf)
 	var order int
 	for i := 1; true; i++ {
-		x = x.Add(origx)
+		var xx Point
+		xx.Set(&x)
+		x.Add(&xx, origx)
 		if x.Eq(inf) {
 			order = i
 			break

@@ -241,6 +241,7 @@ func (z *FieldElement) Div(x, y *FieldElement) *FieldElement {
 	return z
 }
 
+// Now implements interface similar in style to big.Int
 func (z *FieldElement) Rmul(x *FieldElement, y *big.Int) *FieldElement {
 	//num := x.num * y % x.prime
 	var product big.Int
@@ -250,6 +251,7 @@ func (z *FieldElement) Rmul(x *FieldElement, y *big.Int) *FieldElement {
 	return z
 }
 
+// Now implements interface similar in style to big.Int
 func (z *FieldElement) Set(x *FieldElement) *FieldElement {
 	z.num = x.num
 	z.prime = x.prime
@@ -332,38 +334,48 @@ func (p *Point) Repr() string {
 	return "Point(" + p.x.Repr() + ",\n      " + p.y.Repr() + ")_" + p.a.Repr() + "_" + p.b.Repr()
 }
 
-func (z *Point) Rmul(x *Point, y *big.Int) *Point {
+// Now implements interface similar in style to big.Int
+func (z *Point) Rmul(p *Point, m *big.Int) *Point {
 	// If order of FieldElement is Bitcoin's p, then we can assume a value for n,
 	// which we can use to increase efficiency by modding by n
 	// HACK - assumes we never want to use the same p as Bitcoin's p other than when dealing with Bitcoin
 	params := secp256k1_Params()
 	var order big.Int
-	order.Set(&x.x.prime)
+	order.Set(&p.x.prime)
 	var coef big.Int
 	if order.Cmp(&params.p) == 0 {
-		coef.Mod(y, &params.n)
+		coef.Mod(m, &params.n)
 	} else {
-		coef.Set(y)
+		coef.Set(m)
 	}
 
 	var current Point
-	current.Set(x)
+	current.Set(p)
 
 	var _0 big.Int
 	_0.SetInt64(0)
 	var _1 big.Int
 	_1.SetInt64(1)
 
-	result := NewInfPoint(&x.a, &x.b) // Point at infinity acts as zero
+	result := NewInfPoint(&p.a, &p.b) // Point at infinity acts as zero
 	//for coef != 0 {
 	for coef.Cmp(&_0) != 0 {
 		//if coef&1 == 1 {
 		var lsb big.Int
 		lsb.And(&coef, &_1)
 		if lsb.Cmp(&_1) == 0 {
-			result = result.Add(&current)
+			//var result2 Point
+			//result2.Set(result)
+			//result.Add(&result2, &current)
+			// Or can Add() cope with:...
+			result.Add(result, &current) // Test says YES but [  ] are we SURE?
 		}
-		current.Set(current.Add(&current))
+		//var current2 Point
+		//current2.Set(&current)
+		//current.Add(&current2, &current2)
+		// Or can Add() cope with:...
+		current.Add(&current, &current) // Test says YES but [  ] are we SURE?
+
 		//coef >>= 1
 		coef.Rsh(&coef, 1)
 	}
@@ -371,38 +383,46 @@ func (z *Point) Rmul(x *Point, y *big.Int) *Point {
 	return z
 }
 
-func (p *Point) Add(other *Point) *Point {
-	if !p.a.Eq(&other.a) || !p.b.Eq(&other.b) {
+// Now implements interface similar in style to big.Int
+// z = p + q
+func (z *Point) Add(p, q *Point) *Point {
+	if z == nil {
+		panic("Cannot write to nil pointer")
+	}
+	if p == nil || q == nil {
+		panic("Cannot add nil pointers")
+	}
+	if !p.a.Eq(&q.a) || !p.b.Eq(&q.b) {
 		panic("Can't add points that are not on same curve")
 	}
-	var result Point
 	if p.isInf {
-		// If p is point at infinity, it is the identity under addition
-		result.Set(other)
-		return &result
+		// If x is point at infinity, it is the identity under addition
+		z.Set(q)
+		return z
 	}
-	if other.isInf {
-		// If other is point at infinity, it is the identity under addition
-		result.Set(p)
-		return &result
+	if q.isInf {
+		// If y is point at infinity, it is the identity under addition
+		z.Set(p)
+		return z
 	}
 
 	var _0 big.Int
 	_0.SetInt64(0)
 
-	// Handle p==other and y==0 (vertical tangent)
-	//if p.Eq(other) && p.y.num == 0 {
-	if p.Eq(other) && p.y.num.Cmp(&_0) == 0 { // [  ] Is this the zero that is meant?
-		return NewInfPoint(&p.a, &p.b)
+	// Handle p==q and p.y==q.y==0 (vertical tangent)
+	if p.Eq(q) && p.y.num.Cmp(&_0) == 0 {
+		z.Set(NewInfPoint(&p.a, &p.b))
+		return z
 	}
 
-	// Case 1: self.x == other.x, self.y != other.y
+	// Case 1: p.x == q.x, p.y != q.y
 	// Result is point at infinity
 	// panic("Not implemented")
 
 	// Answer Exercise 3
-	if p.x.Eq(&other.x) && !p.y.Eq(&other.y) {
-		return NewInfPoint(&p.a, &p.b)
+	if p.x.Eq(&q.x) && !p.y.Eq(&q.y) {
+		z.Set(NewInfPoint(&p.a, &p.b))
+		return z
 	}
 
 	var _2 big.Int
@@ -413,14 +433,14 @@ func (p *Point) Add(other *Point) *Point {
 	// s=(y2-y1)/(x2-x1)
 	// x3=s**2-x1-x2
 	// y3=s*(x1-x3)-y1
-	if !p.x.Eq(&other.x) {
+	if !p.x.Eq(&q.x) {
 		// panic( "Not implemented")
 
 		// Answer Exercise 5
 		var ydiff FieldElement
-		ydiff.Sub(&other.y, &p.y)
+		ydiff.Sub(&q.y, &p.y)
 		var xdiff FieldElement
-		xdiff.Sub(&other.x, &p.x)
+		xdiff.Sub(&q.x, &p.x)
 		var s FieldElement
 		s.Div(&ydiff, &xdiff)
 
@@ -429,7 +449,7 @@ func (p *Point) Add(other *Point) *Point {
 		var ssquaredMinusX1 FieldElement
 		ssquaredMinusX1.Sub(&ssquared, &p.x)
 		var x3 FieldElement
-		x3.Sub(&ssquaredMinusX1, &other.x)
+		x3.Sub(&ssquaredMinusX1, &q.x)
 
 		var x1MinusX3 FieldElement
 		x1MinusX3.Sub(&p.x, &x3)
@@ -438,7 +458,12 @@ func (p *Point) Add(other *Point) *Point {
 		var y3 FieldElement
 		y3.Sub(&sTimesX1MinusX3, &p.y)
 
-		return NewPoint(&x3, &y3, &p.a, &p.b)
+		z.x.Set(&x3)
+		z.y.Set(&y3)
+		z.a.Set(&p.a)
+		z.b.Set(&p.b)
+		z.isInf = false
+		return z
 	}
 
 	var _3 big.Int
@@ -452,8 +477,8 @@ func (p *Point) Add(other *Point) *Point {
 	// panic("Not implemented")
 
 	// Answer Exercise 7
-	// Handle p,other being same point, so use tangent
-	if p.x.Eq(&other.x) && p.y.Eq(&other.y) {
+	// Handle p,q being same point, so use tangent
+	if p.x.Eq(&q.x) && p.y.Eq(&q.y) {
 		var x1squared FieldElement
 		x1squared.Exp(&p.x, &_2)
 		var x1squaredTimesThree FieldElement
@@ -479,12 +504,18 @@ func (p *Point) Add(other *Point) *Point {
 		var y3 FieldElement
 		y3.Sub(&sTimesX1MinusX3, &p.y)
 
-		return NewPoint(&x3, &y3, &p.a, &p.b)
+		z.x.Set(&x3)
+		z.y.Set(&y3)
+		z.a.Set(&p.a)
+		z.b.Set(&p.b)
+		z.isInf = false
+		return z
 	}
 
 	// Final case, tangent is vertical
-	if p.x.Eq(&other.x) && p.y.num.Cmp(&_0) == 0 { // [  ] Is this what's really meant by "y is zero"
-		return NewInfPoint(&p.a, &p.b)
+	if p.x.Eq(&q.x) && p.y.num.Cmp(&_0) == 0 {
+		z.Set(NewInfPoint(&p.a, &p.b))
+		return z
 	}
 
 	panic("Fell through, missing case?")

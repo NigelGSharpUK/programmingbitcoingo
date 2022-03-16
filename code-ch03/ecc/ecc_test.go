@@ -167,20 +167,24 @@ func TestEccAdd(t *testing.T) {
 	b := NewFieldElement(7, prime)
 	p1 := NewPoint(NewFieldElement(170, prime), NewFieldElement(142, prime), a, b)
 	p2 := NewPoint(NewFieldElement(60, prime), NewFieldElement(139, prime), a, b)
-	sum := NewPoint(NewFieldElement(220, prime), NewFieldElement(181, prime), a, b)
-	if !p1.Add(p2).Eq(sum) {
+	expected := NewPoint(NewFieldElement(220, prime), NewFieldElement(181, prime), a, b)
+	var sum Point
+	sum.Add(p1, p2)
+	if !sum.Eq(expected) {
 		t.Fail()
 	}
 	p1 = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
 	p2 = NewPoint(NewFieldElement(17, prime), NewFieldElement(56, prime), a, b)
-	sum = NewPoint(NewFieldElement(215, prime), NewFieldElement(68, prime), a, b)
-	if !p1.Add(p2).Eq(sum) {
+	expected = NewPoint(NewFieldElement(215, prime), NewFieldElement(68, prime), a, b)
+	sum.Add(p1, p2)
+	if !sum.Eq(expected) {
 		t.Fail()
 	}
 	p1 = NewPoint(NewFieldElement(143, prime), NewFieldElement(98, prime), a, b)
 	p2 = NewPoint(NewFieldElement(76, prime), NewFieldElement(66, prime), a, b)
-	sum = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
-	if !p1.Add(p2).Eq(sum) {
+	expected = NewPoint(NewFieldElement(47, prime), NewFieldElement(71, prime), a, b)
+	sum.Add(p1, p2)
+	if !sum.Eq(expected) {
 		t.Fail()
 	}
 }
